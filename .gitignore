@@ -1,0 +1,10 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+.cxx/
+# Générés à la compilation (voir tools/make_icons.py)
+app/src/main/res/drawable-xhdpi/banner.png
+app/src/main/res/mipmap-*/ic_launcher.png

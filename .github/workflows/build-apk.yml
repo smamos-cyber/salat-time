@@ -1,0 +1,46 @@
+name: Compiler l'APK
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+
+      - name: Générer la bannière et l'icône
+        run: |
+          pip install --quiet pillow
+          python3 tools/make_icons.py app/src/main/res
+
+      - name: Compiler
+        run: |
+          gradle assembleRelease --stacktrace --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk SalatiTime.apk
+
+      - name: APK téléchargeable (onglet Actions)
+        uses: actions/upload-artifact@v4
+        with:
+          name: SalatiTime-apk
+          path: SalatiTime.apk
+
+      - name: Publier dans « Releases » (lien direct, pratique depuis la TV)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Salati Time – build ${{ github.run_number }}
+          files: SalatiTime.apk

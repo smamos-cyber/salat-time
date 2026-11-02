@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_overlay"
+    android:gravity="center"
+    android:minWidth="560dp"
+    android:orientation="vertical"
+    android:paddingStart="40dp"
+    android:paddingTop="24dp"
+    android:paddingEnd="40dp"
+    android:paddingBottom="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🕌  حي على الصلاة"
+        android:textColor="@color/gold_soft"
+        android:textSize="28sp" />
+
+    <TextView
+        android:id="@+id/overlayTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/text"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/overlaySubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/gold"
+        android:textSize="22sp" />
+
+    <Button
+        android:id="@+id/overlayStop"
+        style="@style/Salati.Button"
+        android:layout_marginTop="18dp"
+        android:text="■  Arrêter l\'adhan" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="OK ou Retour sur la télécommande pour arrêter"
+        android:textColor="@color/text_dim"
+        android:textSize="14sp" />
+</LinearLayout>
