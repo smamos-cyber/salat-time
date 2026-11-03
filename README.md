@@ -18,7 +18,8 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
   - importer un **MP3** (sélecteur de fichiers, ou fichiers de la TV / clé USB) ;
   - coller un **lien YouTube** : seul l'audio est extrait et enregistré dans l'appli (lecture hors-ligne, sans vidéo ni pub) ;
   - lien direct vers un MP3 ;
-  - un adhan par défaut + un adhan spécifique possible pour Fajr (ou n'importe quelle prière).
+  - un adhan intégré à l'application (islamcan.com – azan1), utilisé par défaut dès l'installation ;
+  - un adhan par défaut au choix + un adhan spécifique possible pour Fajr (ou n'importe quelle prière).
 - Reprogrammation automatique après redémarrage de la TV, changement d'heure ou de fuseau.
 
 ## Obtenir l'APK sans rien installer (GitHub, gratuit)
@@ -31,14 +32,15 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
 4. L'APK apparaît dans **Releases** → `SalatiTime.apk`.
    Sur la TV, l'application gratuite *Downloader* (code AFTVnews) permet d'ouvrir ce lien et d'installer l'APK.
 
-Note : chaque compilation GitHub signe l'APK avec une clé temporaire différente. Pour installer une nouvelle version,
-désinstallez d'abord l'ancienne (les adhans importés seront à réimporter).
+Les APK sont signés avec une clé fixe (`app/salati-release.jks`) : chaque nouvelle version s'installe
+par-dessus la précédente en conservant les réglages et les adhans importés.
 
 ## Compiler et installer avec Android Studio
 
 1. Ouvrir le dossier `SalatiTimeTV` dans **Android Studio** (Ladybug ou plus récent, JDK 17).
 2. Laisser Gradle synchroniser (télécharge Android Gradle Plugin 8.7, Kotlin 2.1, NewPipeExtractor depuis JitPack).
 3. Générer la bannière et l'icône une fois : `pip install pillow && python3 tools/make_icons.py app/src/main/res`
+   et télécharger l'adhan intégré : `curl -L -o app/src/main/res/raw/adhan_default.mp3 https://www.islamcan.com/audio/adhan/azan1.mp3`
    (Android Studio crée lui-même le wrapper Gradle à partir de `gradle/wrapper/gradle-wrapper.properties`.)
    Puis menu *Build > Build APK(s)*, ou en ligne de commande : `gradle assembleDebug`
    → `app/build/outputs/apk/debug/app-debug.apk`

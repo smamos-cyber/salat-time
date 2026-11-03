@@ -8,3 +8,4 @@ captures/
 # Générés à la compilation (voir tools/make_icons.py)
 app/src/main/res/drawable-xhdpi/banner.png
 app/src/main/res/mipmap-*/ic_launcher.png
+app/src/main/res/raw/adhan_default.mp3

@@ -60,6 +60,31 @@ object AdhanRepository {
         com.salatitime.tv.prayer.Prayer.entries.forEach { if (prefs.adhanOverride(it) == id) prefs.setAdhanOverride(it, "") }
     }
 
+    /**
+     * Au premier lancement : copie l'adhan intégré à l'application (res/raw/adhan_default.mp3,
+     * téléchargé à la compilation) dans la bibliothèque et le définit comme son par défaut.
+     */
+    fun ensureBundledDefault(ctx: Context) {
+        val sp = sp(ctx)
+        if (sp.getBoolean("bundledAdhanAdded", false)) return
+        try {
+            val out = File(dir(ctx), "$BUNDLED_ID.mp3")
+            ctx.resources.openRawResource(com.salatitime.tv.R.raw.adhan_default).use { input ->
+                out.outputStream().use { input.copyTo(it) }
+            }
+            if (list(ctx).none { it.id == BUNDLED_ID }) {
+                save(ctx, listOf(AdhanSound(BUNDLED_ID, "Adhan (par défaut)", out.name, "intégré")) + list(ctx))
+            }
+            val prefs = Prefs(ctx)
+            if (prefs.defaultAdhanId.isEmpty() || get(ctx, prefs.defaultAdhanId) == null) {
+                prefs.defaultAdhanId = BUNDLED_ID
+            }
+            sp.edit().putBoolean("bundledAdhanAdded", true).apply()
+        } catch (_: Exception) { }
+    }
+
+    const val BUNDLED_ID = "bundled-adhan"
+
     private fun register(ctx: Context, name: String, file: File, source: String): AdhanSound {
         val sound = AdhanSound(file.nameWithoutExtension, name.ifBlank { "Adhan" }, file.name, source)
         save(ctx, list(ctx) + sound)

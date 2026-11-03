@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import com.salatitime.tv.alarm.PrayerScheduler
+import com.salatitime.tv.data.AdhanRepository
 
 class SalatiApp : Application() {
 
@@ -22,6 +23,7 @@ class SalatiApp : Application() {
             }
         )
         PrayerScheduler.schedule(this)
+        Thread { AdhanRepository.ensureBundledDefault(this) }.start()
     }
 
     companion object {

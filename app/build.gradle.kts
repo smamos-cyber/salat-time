@@ -11,16 +11,26 @@ android {
         applicationId = "com.salatitime.tv"
         minSdk = 26          // Android TV 8.0 et plus
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
+    }
+
+    signingConfigs {
+        // Clé fixe : les nouvelles versions s'installent par-dessus l'ancienne sans désinstaller.
+        // Projet personnel : pour une publication sur le Play Store, utilisez une clé privée hors du dépôt.
+        create("salati") {
+            storeFile = file("salati-release.jks")
+            storePassword = "salatitime"
+            keyAlias = "salati"
+            keyPassword = "salatitime"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Signé avec la clé debug pour pouvoir l'installer directement (à remplacer pour le Play Store)
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("salati")
         }
     }
 

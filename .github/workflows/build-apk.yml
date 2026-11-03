@@ -27,6 +27,12 @@ jobs:
           pip install --quiet pillow
           python3 tools/make_icons.py app/src/main/res
 
+      - name: Télécharger l'adhan intégré par défaut
+        run: |
+          mkdir -p app/src/main/res/raw
+          curl -fL --retry 3 -A "Mozilla/5.0" -o app/src/main/res/raw/adhan_default.mp3 https://www.islamcan.com/audio/adhan/azan1.mp3
+          ls -la app/src/main/res/raw
+
       - name: Compiler
         run: |
           gradle assembleRelease --stacktrace --no-daemon

@@ -124,7 +124,7 @@ class AlertService : Service() {
     private fun playAdhan(soundId: String, volume: Int) {
         requestFocus()
         val uri: Uri? = AdhanRepository.fileFor(this, soundId)?.let { Uri.fromFile(it) }
-            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            ?: Uri.parse("android.resource://$packageName/${R.raw.adhan_default}")
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         if (uri == null) {
             playFallbackTone(); return
