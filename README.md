@@ -20,6 +20,9 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
   - lien direct vers un MP3 ;
   - un adhan intégré à l'application (islamcan.com – azan1), utilisé par défaut dès l'installation ;
   - un adhan par défaut au choix + un adhan spécifique possible pour Fajr (ou n'importe quelle prière).
+- **Allumer la TV pour l'adhan** : si la TV est en veille à l'heure de la prière, l'appli rallume l'écran puis joue l'adhan
+  (réglable : non / adhan seulement / adhan et notifications, avec un bouton de test). Nécessite le « démarrage rapide »
+  de la TV ; une TV débranchée ou en veille profonde ne peut pas être rallumée.
 - Reprogrammation automatique après redémarrage de la TV, changement d'heure ou de fuseau.
 
 ## Obtenir l'APK sans rien installer (GitHub, gratuit)
@@ -30,6 +33,8 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
    Ou, en ligne de commande : `git init && git add . && git commit -m init && git remote add origin <url> && git push -u origin main`
 3. La compilation démarre seule (onglet **Actions**, ~5 min).
 4. L'APK apparaît dans **Releases** → `SalatiTime.apk`.
+   Lien toujours valable vers la dernière version :
+   `https://github.com/smamos-cyber/salat-time/releases/latest/download/SalatiTime.apk`
    Sur la TV, l'application gratuite *Downloader* (code AFTVnews) permet d'ouvrir ce lien et d'installer l'APK.
 
 Les APK sont signés avec une clé fixe (`app/salati-release.jks`) : chaque nouvelle version s'installe

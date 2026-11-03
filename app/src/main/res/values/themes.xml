@@ -33,4 +33,10 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:focusable">true</item>
     </style>
+
+    <!-- Activité invisible utilisée uniquement pour rallumer l'écran -->
+    <style name="Theme.Salati.Wake" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowNoDisplay">false</item>
+    </style>
 </resources>
