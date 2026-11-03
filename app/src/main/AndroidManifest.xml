@@ -42,6 +42,16 @@
 
         <activity android:name=".ui.SettingsActivity" android:exported="false" />
         <activity android:name=".ui.AdhanActivity" android:exported="false" />
+        <!-- Rallume l'écran de la TV à l'heure de la prière -->
+        <activity
+            android:name=".ui.WakeActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Salati.Wake" />
 
         <receiver android:name=".alarm.AlarmReceiver" android:exported="false" />
 

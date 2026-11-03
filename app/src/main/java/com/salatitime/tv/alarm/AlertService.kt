@@ -26,6 +26,7 @@ import com.salatitime.tv.R
 import com.salatitime.tv.SalatiApp
 import com.salatitime.tv.data.AdhanRepository
 import com.salatitime.tv.data.Prefs
+import com.salatitime.tv.data.WakeMode
 import com.salatitime.tv.prayer.AlertMode
 import com.salatitime.tv.prayer.Prayer
 import com.salatitime.tv.ui.MainActivity
@@ -76,9 +77,31 @@ class AlertService : Service() {
 
         startInForeground(title, subtitle)
         handler.removeCallbacks(stopRunnable)
+        handler.removeCallbacks(pendingAlert)
         releaseAudio()
         overlay.hide()
 
+        if (mode == AlertMode.NONE) {
+            stopAll()
+            return START_NOT_STICKY
+        }
+
+        // Rallumer la TV si elle est en veille, puis laisser l'écran et le son se réveiller
+        val forceWake = intent.getBooleanExtra(EXTRA_FORCE_WAKE, false)
+        val wantWake = forceWake || (!pre && when (prefs.wakeMode) {
+            WakeMode.OFF -> false
+            WakeMode.ADHAN -> mode == AlertMode.ADHAN
+            WakeMode.ALL -> true
+        })
+        val woke = wantWake && ScreenWaker.wake(this)
+        pendingAlert = Runnable { runAlert(mode, prayer, title, subtitle, prefs) }
+        if (woke) handler.postDelayed(pendingAlert, WAKE_DELAY_MS) else pendingAlert.run()
+        return START_NOT_STICKY
+    }
+
+    private var pendingAlert: Runnable = Runnable { }
+
+    private fun runAlert(mode: AlertMode, prayer: Prayer, title: String, subtitle: String, prefs: Prefs) {
         when (mode) {
             AlertMode.NONE -> stopAll()
             AlertMode.NOTIFICATION -> {
@@ -95,7 +118,6 @@ class AlertService : Service() {
                 handler.postDelayed(stopRunnable, MAX_ADHAN_MS)
             }
         }
-        return START_NOT_STICKY
     }
 
     // ---------------- Audio ----------------
@@ -178,6 +200,7 @@ class AlertService : Service() {
 
     private fun stopAll() {
         handler.removeCallbacks(stopRunnable)
+        handler.removeCallbacks(pendingAlert)
         releaseAudio()
         overlay.hide()
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
@@ -186,6 +209,7 @@ class AlertService : Service() {
 
     override fun onDestroy() {
         handler.removeCallbacks(stopRunnable)
+        handler.removeCallbacks(pendingAlert)
         releaseAudio()
         overlay.hide()
         super.onDestroy()
@@ -246,16 +270,23 @@ class AlertService : Service() {
         const val EXTRA_PRE = "pre"
         const val EXTRA_TIME = "time"
         const val EXTRA_FORCE_MODE = "forceMode"
+        const val EXTRA_FORCE_WAKE = "forceWake"
+        /** Temps laissé à la TV pour allumer l'écran et la sortie audio. */
+        private const val WAKE_DELAY_MS = 3_000L
         const val ACTION_STOP = "com.salatitime.tv.STOP_ALERT"
         private const val FG_ID = 42
         private const val BANNER_DURATION_MS = 20_000L
         private const val MAX_ADHAN_MS = 10 * 60_000L
 
-        fun start(ctx: Context, prayer: Prayer, pre: Boolean, time: Long, forceMode: AlertMode? = null) {
+        fun start(
+            ctx: Context, prayer: Prayer, pre: Boolean, time: Long,
+            forceMode: AlertMode? = null, forceWake: Boolean = false
+        ) {
             val i = Intent(ctx, AlertService::class.java)
                 .putExtra(EXTRA_PRAYER, prayer.name)
                 .putExtra(EXTRA_PRE, pre)
                 .putExtra(EXTRA_TIME, time)
+                .putExtra(EXTRA_FORCE_WAKE, forceWake)
             forceMode?.let { i.putExtra(EXTRA_FORCE_MODE, it.name) }
             ContextCompat.startForegroundService(ctx, i)
         }

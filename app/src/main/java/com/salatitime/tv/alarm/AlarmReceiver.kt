@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.salatitime.tv.prayer.AlertMode
 import com.salatitime.tv.prayer.Prayer
 import java.time.Instant
 import java.time.ZoneId
@@ -20,7 +21,12 @@ class AlarmReceiver : BroadcastReceiver() {
         val lateMs = System.currentTimeMillis() - time
         if (prayer != null && lateMs < MAX_LATE_MS) {
             try {
-                AlertService.start(context, prayer, pre, time)
+                val force = intent.getStringExtra(AlertService.EXTRA_FORCE_MODE)
+                    ?.let { n -> AlertMode.entries.firstOrNull { it.name == n } }
+                AlertService.start(
+                    context, prayer, pre, time, force,
+                    forceWake = intent.getBooleanExtra(AlertService.EXTRA_FORCE_WAKE, false)
+                )
             } catch (e: Exception) {
                 Log.e("Salati", "Impossible de démarrer l'alerte", e)
             }

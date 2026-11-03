@@ -11,6 +11,12 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+enum class WakeMode(val label: String) {
+    OFF("Non"),
+    ADHAN("Oui, pour l'adhan"),
+    ALL("Oui, pour l'adhan et les notifications")
+}
+
 class Prefs(context: Context) {
     private val sp = context.applicationContext.getSharedPreferences("salati", Context.MODE_PRIVATE)
 
@@ -79,6 +85,11 @@ class Prefs(context: Context) {
     fun adhanOverride(p: Prayer): String = sp.getString("adhan_${p.name}", "") ?: ""
     fun setAdhanOverride(p: Prayer, id: String) = sp.edit { putString("adhan_${p.name}", id) }
     fun soundIdFor(p: Prayer): String = adhanOverride(p).ifEmpty { defaultAdhanId }
+
+    /** Allumer l'écran de la TV s'il est en veille à l'heure de la prière. */
+    var wakeMode: WakeMode
+        get() = enumOr(sp.getString("wakeMode", null), WakeMode.ADHAN)
+        set(v) = sp.edit { putString("wakeMode", v.name) }
 
     var overlayHintShown: Boolean
         get() = sp.getBoolean("overlayHint", false)

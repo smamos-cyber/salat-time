@@ -1,12 +1,19 @@
 package com.salatitime.tv.ui
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.salatitime.tv.R
+import com.salatitime.tv.alarm.AlarmReceiver
+import com.salatitime.tv.alarm.AlertService
 import com.salatitime.tv.alarm.PrayerScheduler
 import com.salatitime.tv.data.Prefs
+import com.salatitime.tv.data.WakeMode
+import com.salatitime.tv.prayer.AlertMode
 import com.salatitime.tv.prayer.CalcMethod
 import com.salatitime.tv.prayer.HighLatRule
 import com.salatitime.tv.prayer.Prayer
@@ -75,6 +82,12 @@ class SettingsActivity : AppCompatActivity() {
                 prefs.volume = volumes[it]; changed()
             }
         }
+        rows.row("📺  Allumer la TV pour la prière", { prefs.wakeMode.label }) {
+            choose("Allumer la TV si elle est en veille", WakeMode.entries.map { it.label }, prefs.wakeMode.ordinal) {
+                prefs.wakeMode = WakeMode.entries[it]; changed()
+            }
+        }
+        rows.row("🧪  Tester le réveil de la TV", { "adhan dans 1 minute" }) { scheduleWakeTest() }
         for (p in Prayer.entries) {
             rows.row("${p.label}   ${p.arabic}", { PrayerDialogs.summary(this, prefs, p) }) {
                 PrayerDialogs.show(this, prefs, p) { rows.refresh() }
@@ -88,8 +101,52 @@ class SettingsActivity : AppCompatActivity() {
         rows.row("Alarmes exactes", {
             if (Permissions.canExactAlarm(this)) "✅ Accordée" else "❌ À activer"
         }) { Permissions.requestExactAlarm(this) }
+        rows.row("Aide : la TV ne s'allume pas pour l'adhan") {
+            info("Allumer la TV pour l'adhan", WAKE_HELP)
+        }
         rows.row("Aide : l'écran d'autorisation n'existe pas sur ma TV") {
             info("Activer via ADB", Permissions.adbHelp(this))
         }
+    }
+
+    /** Programme un adhan d'essai dans 1 minute, avec réveil forcé de la TV. */
+    private fun scheduleWakeTest() {
+        val am = getSystemService(AlarmManager::class.java) ?: return
+        val time = System.currentTimeMillis() + 60_000L
+        val intent = Intent(this, AlarmReceiver::class.java)
+            .setAction(ACTION_WAKE_TEST)
+            .putExtra(AlertService.EXTRA_PRAYER, Prayer.DHUHR.name)
+            .putExtra(AlertService.EXTRA_PRE, false)
+            .putExtra(AlertService.EXTRA_TIME, time)
+            .putExtra(AlertService.EXTRA_FORCE_MODE, AlertMode.ADHAN.name)
+            .putExtra(AlertService.EXTRA_FORCE_WAKE, true)
+        val pi = PendingIntent.getBroadcast(
+            this, 200, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        try {
+            val show = PendingIntent.getActivity(
+                this, 201, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE
+            )
+            am.setAlarmClock(AlarmManager.AlarmClockInfo(time, show), pi)
+        } catch (e: SecurityException) {
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pi)
+        }
+        info(
+            "Test programmé",
+            "Éteignez maintenant la TV avec la télécommande (mise en veille, sans la débrancher).\n\n" +
+                "Dans 1 minute, elle devrait se rallumer et jouer l'adhan."
+        )
+    }
+
+    private companion object {
+        const val ACTION_WAKE_TEST = "com.salatitime.tv.WAKE_TEST"
+        const val WAKE_HELP =
+            "Une application ne peut rallumer la TV que si elle est en veille, pas si elle est débranchée.\n\n" +
+                "1. Activez le « Démarrage rapide » (Sony, Philips : Paramètres > Système > Alimentation ; " +
+                "TCL, Hisense : « Démarrage instantané » ou « Veille rapide »).\n" +
+                "2. Désactivez le mode « Éco » ou « Veille à faible consommation » s'il existe.\n" +
+                "3. Vérifiez que l'autorisation « Afficher par-dessus les autres applis » est accordée.\n" +
+                "4. Utilisez « Tester le réveil de la TV » pour vérifier.\n\n" +
+                "Certains modèles bloquent malgré tout le réveil par une application."
     }
 }
