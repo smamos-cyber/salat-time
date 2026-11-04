@@ -1,0 +1,16 @@
+name: Chercher des fonds d'écran (outil)
+
+on:
+  push:
+    branches: ['outils-*']
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/fetch_wallpapers.py wallpapers
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wallpapers
+          path: wallpapers
