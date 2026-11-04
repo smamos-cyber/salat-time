@@ -91,7 +91,7 @@ class Prefs(context: Context) {
         get() = enumOr(sp.getString("wakeMode", null), WakeMode.ADHAN)
         set(v) = sp.edit { putString("wakeMode", v.name) }
 
-    // ---------- Blocage de la TV après la prière ----------
+    // ---------- Blocage de la TV pendant la prière ----------
     /** Durée du blocage après la prière, en minutes (0 = désactivé). */
     fun lockMinutes(p: Prayer): Int = sp.getInt("lock_${p.name}", 0)
     fun setLockMinutes(p: Prayer, minutes: Int) = sp.edit { putInt("lock_${p.name}", minutes) }

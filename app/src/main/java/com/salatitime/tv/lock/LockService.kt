@@ -70,7 +70,11 @@ class LockService : Service() {
             LockManager.mute(this)
             if (tickCount % 10 == 0) requestFocus()
         }
-        if (!ov.isShown() && !alertPlaying) ov.show(prefs.unlockCode.isNotEmpty())
+        if (!ov.isShown()) {
+            ov.show(prefs.unlockCode.isNotEmpty())
+            // L'adhan en cours reste visible et contrôlable au-dessus de l'écran de blocage
+            if (alertPlaying) AlertService.raiseOverlay()
+        }
         val prayer = Prayer.entries.firstOrNull { it.name == prefs.lockPrayer }
         ov.update(
             title = prayer?.let { "Temps de la prière : ${it.label}  ${it.arabic}" } ?: "Temps de la prière",
