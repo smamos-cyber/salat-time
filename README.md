@@ -23,6 +23,9 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
 - **Allumer la TV pour l'adhan** : si la TV est en veille à l'heure de la prière, l'appli rallume l'écran puis joue l'adhan
   (réglable : non / adhan seulement / adhan et notifications, avec un bouton de test). Nécessite le « démarrage rapide »
   de la TV ; une TV débranchée ou en veille profonde ne peut pas être rallumée.
+- **Blocage de la TV après la prière** : écran plein écran avec compte à rebours, de 10 min à 2 h, réglable pour chaque prière.
+  Le son est coupé et rien n'est utilisable. Le blocage reprend après extinction, redémarrage ou débranchement de la TV.
+  Code de déblocage d'urgence facultatif.
 - Reprogrammation automatique après redémarrage de la TV, changement d'heure ou de fuseau.
 
 ## Obtenir l'APK sans rien installer (GitHub, gratuit)

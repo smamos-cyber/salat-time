@@ -91,6 +91,30 @@ class Prefs(context: Context) {
         get() = enumOr(sp.getString("wakeMode", null), WakeMode.ADHAN)
         set(v) = sp.edit { putString("wakeMode", v.name) }
 
+    // ---------- Blocage de la TV après la prière ----------
+    /** Durée du blocage après la prière, en minutes (0 = désactivé). */
+    fun lockMinutes(p: Prayer): Int = sp.getInt("lock_${p.name}", 0)
+    fun setLockMinutes(p: Prayer, minutes: Int) = sp.edit { putInt("lock_${p.name}", minutes) }
+
+    /** Heure de fin du blocage en cours (0 = aucun). */
+    var lockUntil: Long
+        get() = sp.getLong("lockUntil", 0L)
+        set(v) = sp.edit(commit = true) { putLong("lockUntil", v) }
+    var lockDurationMin: Int
+        get() = sp.getInt("lockDuration", 120)
+        set(v) = sp.edit(commit = true) { putInt("lockDuration", v) }
+    var lockPrayer: String
+        get() = sp.getString("lockPrayer", "") ?: ""
+        set(v) = sp.edit { putString("lockPrayer", v) }
+    var lockMuted: Boolean
+        get() = sp.getBoolean("lockMuted", false)
+        set(v) = sp.edit(commit = true) { putBoolean("lockMuted", v) }
+
+    /** Code de déblocage d'urgence ("" = aucun, le blocage ne peut pas être levé avant la fin). */
+    var unlockCode: String
+        get() = sp.getString("unlockCode", "") ?: ""
+        set(v) = sp.edit { putString("unlockCode", v) }
+
     var overlayHintShown: Boolean
         get() = sp.getBoolean("overlayHint", false)
         set(v) = sp.edit { putBoolean("overlayHint", v) }

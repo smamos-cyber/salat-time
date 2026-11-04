@@ -13,6 +13,7 @@ import com.salatitime.tv.alarm.AlertService
 import com.salatitime.tv.alarm.PrayerScheduler
 import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.data.WakeMode
+import com.salatitime.tv.lock.LockManager
 import com.salatitime.tv.prayer.AlertMode
 import com.salatitime.tv.prayer.CalcMethod
 import com.salatitime.tv.prayer.HighLatRule
@@ -88,6 +89,30 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
         rows.row("🧪  Tester le réveil de la TV", { "adhan dans 1 minute" }) { scheduleWakeTest() }
+        rows.header("Blocage de la TV après la prière")
+        rows.row("🔒  Durée du blocage", { lockSummary() }) {
+            info(
+                "Durée du blocage",
+                "Choisissez la durée pour chaque prière dans la liste des prières ci-dessous " +
+                    "(ligne « Bloquer la TV après la prière »), de 10 min à 2 h.\n\n" +
+                    "Le blocage commence à la fin de l'adhan et reprend même si la TV est éteinte, " +
+                    "redémarrée ou débranchée."
+            )
+        }
+        rows.row("🔑  Code de déblocage d'urgence", {
+            if (prefs.unlockCode.isEmpty()) "Aucun (déblocage impossible avant la fin)" else "Défini (${prefs.unlockCode.length} chiffres)"
+        }) {
+            askText("Code de déblocage (4 à 8 chiffres, vide = aucun)", "1234", inputType = PIN_INPUT) { code ->
+                val c = code.trim()
+                if (c.isEmpty() || c.matches(Regex("\\d{4,8}"))) {
+                    prefs.unlockCode = c; rows.refresh()
+                } else info("Code invalide", "Le code doit contenir de 4 à 8 chiffres.")
+            }
+        }
+        rows.row("🧪  Tester le blocage", { "1 minute" }) {
+            LockManager.start(this, Prayer.DHUHR, 1)
+        }
+        rows.header("Prières")
         for (p in Prayer.entries) {
             rows.row("${p.label}   ${p.arabic}", { PrayerDialogs.summary(this, prefs, p) }) {
                 PrayerDialogs.show(this, prefs, p) { rows.refresh() }
@@ -138,7 +163,14 @@ class SettingsActivity : AppCompatActivity() {
         )
     }
 
+    private fun lockSummary(): String {
+        val set = Prayer.entries.filter { it.isSalah && prefs.lockMinutes(it) > 0 }
+        if (set.isEmpty()) return "Désactivé"
+        return set.joinToString(" · ") { "${it.label} ${LockManager.durationLabel(prefs.lockMinutes(it))}" }
+    }
+
     private companion object {
+        val PIN_INPUT = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
         const val ACTION_WAKE_TEST = "com.salatitime.tv.WAKE_TEST"
         const val WAKE_HELP =
             "Une application ne peut rallumer la TV que si elle est en veille, pas si elle est débranchée.\n\n" +

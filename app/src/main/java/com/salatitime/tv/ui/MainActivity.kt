@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         refreshTimes()
         handler.post(ticker)
+        com.salatitime.tv.lock.LockManager.ensureRunning(this)
         maybeAutoLocate()
         maybeShowOverlayHint()
     }
