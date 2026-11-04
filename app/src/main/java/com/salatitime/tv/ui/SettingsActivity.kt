@@ -89,13 +89,13 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
         rows.row("🧪  Tester le réveil de la TV", { "adhan dans 1 minute" }) { scheduleWakeTest() }
-        rows.header("Blocage de la TV après la prière")
+        rows.header("Blocage de la TV pendant la prière")
         rows.row("🔒  Durée du blocage", { lockSummary() }) {
             info(
                 "Durée du blocage",
                 "Choisissez la durée pour chaque prière dans la liste des prières ci-dessous " +
-                    "(ligne « Bloquer la TV après la prière »), de 10 min à 2 h.\n\n" +
-                    "Le blocage commence à la fin de l'adhan et reprend même si la TV est éteinte, " +
+                    "(ligne « Bloquer la TV dès l'adhan »), de 10 min à 2 h.\n\n" +
+                    "Le blocage commence dès le début de l'adhan et reprend même si la TV est éteinte, " +
                     "redémarrée ou débranchée."
             )
         }

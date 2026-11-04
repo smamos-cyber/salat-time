@@ -32,7 +32,7 @@ object PrayerDialogs {
             "Ajustement de l'horaire : ${Format.offset(prefs.offset(p))}",
             "▶  Tester cette alerte maintenant"
         )
-        if (p.isSalah) items += "🔒  Bloquer la TV après la prière : ${LockManager.durationLabel(prefs.lockMinutes(p))}"
+        if (p.isSalah) items += "🔒  Bloquer la TV dès l'adhan : ${LockManager.durationLabel(prefs.lockMinutes(p))}"
         ctx.choose("${p.label}  ${p.arabic}", items) { which ->
             when (which) {
                 0 -> ctx.choose("Alerte pour ${p.label}", AlertMode.entries.map { "${it.icon}  ${it.label}" }, mode.ordinal) {
@@ -57,7 +57,7 @@ object PrayerDialogs {
                 }
                 4 -> {
                     val values = LockManager.DURATIONS
-                    ctx.choose("Bloquer la TV après ${p.label}", values.map { LockManager.durationLabel(it) },
+                    ctx.choose("Bloquer la TV à partir de l'adhan de ${p.label}", values.map { LockManager.durationLabel(it) },
                         values.indexOf(prefs.lockMinutes(p))) {
                         prefs.setLockMinutes(p, values[it])
                         changed(ctx, onChanged)

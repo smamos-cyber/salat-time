@@ -94,8 +94,8 @@ class AlertService : Service() {
             WakeMode.ADHAN -> mode == AlertMode.ADHAN
             WakeMode.ALL -> true
         })
-        // Blocage de la TV à la fin de l'alerte (vraies alarmes uniquement, pas les tests)
-        lockAfter = if (intent.getBooleanExtra(EXTRA_ALLOW_LOCK, false) && !pre && prayer.isSalah)
+        // Blocage de la TV dès le début de l'alerte (vraies alarmes uniquement, pas les tests)
+        lockPrayer = if (intent.getBooleanExtra(EXTRA_ALLOW_LOCK, false) && !pre && prayer.isSalah)
             prayer.takeIf { prefs.lockMinutes(it) > 0 } else null
 
         val woke = wantWake && ScreenWaker.wake(this)
@@ -105,11 +105,20 @@ class AlertService : Service() {
     }
 
     private var pendingAlert: Runnable = Runnable { }
-    private var lockAfter: Prayer? = null
+    private var lockPrayer: Prayer? = null
+    /** Panneau affiché (pour le remettre au premier plan au-dessus de l'écran de blocage). */
+    private var shownMode: AlertMode? = null
+    private var shownTitle = ""
+    private var shownSubtitle = ""
 
     private fun runAlert(mode: AlertMode, prayer: Prayer, title: String, subtitle: String, prefs: Prefs) {
         isPlaying = true
+        instance = this
         LockManager.unmute(this)
+        shownMode = mode; shownTitle = title; shownSubtitle = subtitle
+        // Le blocage commence en même temps que l'adhan ; son écran passe sous le panneau de l'adhan
+        lockPrayer?.let { p -> LockManager.start(this, p, prefs.lockMinutes(p)) }
+        lockPrayer = null
         when (mode) {
             AlertMode.NONE -> stopAll()
             AlertMode.NOTIFICATION -> {
@@ -210,9 +219,9 @@ class AlertService : Service() {
         handler.removeCallbacks(stopRunnable)
         handler.removeCallbacks(pendingAlert)
         isPlaying = false
-        // Démarrer le blocage pendant que le panneau de l'adhan est encore visible
-        lockAfter?.let { p -> LockManager.start(this, p, Prefs(this).lockMinutes(p)) }
-        lockAfter = null
+        shownMode = null
+        lockPrayer = null
+        if (instance === this) instance = null
         releaseAudio()
         overlay.hide()
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
@@ -221,6 +230,7 @@ class AlertService : Service() {
 
     override fun onDestroy() {
         isPlaying = false
+        if (instance === this) instance = null
         handler.removeCallbacks(stopRunnable)
         handler.removeCallbacks(pendingAlert)
         releaseAudio()
@@ -288,6 +298,17 @@ class AlertService : Service() {
 
         /** Vrai pendant une alerte : le blocage laisse passer le son et le panneau. */
         @Volatile var isPlaying = false
+        private var instance: AlertService? = null
+
+        /** Remet le panneau de l'alerte au-dessus de l'écran de blocage qui vient d'apparaître. */
+        fun raiseOverlay() {
+            val s = instance ?: return
+            when (s.shownMode) {
+                AlertMode.ADHAN -> s.overlay.showAdhan(s.shownTitle, s.shownSubtitle, onStop = { s.stopAll() })
+                AlertMode.NOTIFICATION -> s.overlay.showBanner(s.shownTitle, s.shownSubtitle)
+                else -> {}
+            }
+        }
         /** Temps laissé à la TV pour allumer l'écran et la sortie audio. */
         private const val WAKE_DELAY_MS = 3_000L
         const val ACTION_STOP = "com.salatitime.tv.STOP_ALERT"

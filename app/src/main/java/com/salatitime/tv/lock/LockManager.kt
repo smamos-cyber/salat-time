@@ -9,7 +9,7 @@ import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.prayer.Prayer
 
 /**
- * Blocage de la TV après la prière.
+ * Blocage de la TV pendant la prière.
  *
  * L'heure de fin est enregistrée : le blocage reprend tout seul après extinction,
  * redémarrage ou débranchement de la TV, tant que le temps n'est pas écoulé.
