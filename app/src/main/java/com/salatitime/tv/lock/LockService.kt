@@ -48,7 +48,7 @@ class LockService : Service() {
             return START_NOT_STICKY
         }
         if (overlay == null) {
-            overlay = LockOverlay(this) { code -> tryUnlock(code) }
+            overlay = LockOverlay(this, onCode = { code -> tryUnlock(code) }, onEmergency = { emergencyCall() })
         }
         handler.removeCallbacks(ticker)
         handler.post(ticker)
@@ -63,6 +63,14 @@ class LockService : Service() {
         }
         val prefs = Prefs(this)
         val ov = overlay ?: return
+        // Téléphone : ne jamais empêcher un appel (entrant, sortant, ou appel audio/vidéo d'une appli)
+        if (inCall() || System.currentTimeMillis() < emergencyUntil) {
+            if (inCall()) emergencyUntil = maxOf(emergencyUntil, System.currentTimeMillis() + 15_000L)
+            if (ov.isShown()) ov.hide()
+            LockManager.unmute(this)
+            tickCount++
+            return
+        }
         // Pendant un adhan, laisser le son et le panneau de l'adhan passer
         val alertPlaying = AlertService.isPlaying
         if (alertPlaying) {
@@ -81,9 +89,26 @@ class LockService : Service() {
         ov.update(
             title = prayer?.let { "Temps de la prière : ${it.label}  ${it.arabic}" } ?: "Temps de la prière",
             countdown = formatRemaining(remaining),
-            until = "La TV sera de nouveau disponible à ${Format.time(prefs.lockUntil)}"
+            until = "De nouveau disponible à ${Format.time(prefs.lockUntil)}"
         )
         tickCount++
+    }
+
+    private var emergencyUntil = 0L
+
+    private fun inCall(): Boolean {
+        val mode = getSystemService(AudioManager::class.java)?.mode ?: return false
+        return mode == AudioManager.MODE_RINGTONE || mode == AudioManager.MODE_IN_CALL ||
+            mode == AudioManager.MODE_IN_COMMUNICATION
+    }
+
+    /** Ouvre le composeur avec le 112 et retire l'écran de blocage le temps de l'appel. */
+    private fun emergencyCall() {
+        emergencyUntil = System.currentTimeMillis() + EMERGENCY_MS
+        overlay?.hide()
+        runCatching {
+            startActivity(Intent(Intent.ACTION_DIAL, android.net.Uri.parse("tel:112")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
     }
 
     private fun tryUnlock(code: String): Boolean {
@@ -149,5 +174,7 @@ class LockService : Service() {
 
     private companion object {
         const val FG_ID = 43
+        /** Temps laissé pour composer un numéro d'urgence ; prolongé tant que l'appel dure. */
+        const val EMERGENCY_MS = 90_000L
     }
 }

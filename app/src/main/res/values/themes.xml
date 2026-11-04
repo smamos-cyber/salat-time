@@ -20,9 +20,9 @@
     <style name="Salati.Button" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginStart">10dp</item>
-        <item name="android:layout_marginEnd">10dp</item>
-        <item name="android:minWidth">180dp</item>
+        <item name="android:layout_marginStart">@dimen/btn_margin</item>
+        <item name="android:layout_marginEnd">@dimen/btn_margin</item>
+        <item name="android:minWidth">@dimen/btn_min_width</item>
         <item name="android:paddingStart">28dp</item>
         <item name="android:paddingEnd">28dp</item>
         <item name="android:paddingTop">12dp</item>

@@ -1,4 +1,4 @@
-# Salati Time – Horaires de prière pour Android TV
+# Salati Time – Horaires de prière pour Android TV et smartphone
 
 Application Android TV (Kotlin) qui affiche les horaires de prière selon votre position et vous avertit
 à l'heure de chaque prière, **quel que soit l'écran affiché** (chaîne TV, Netflix, YouTube…).
@@ -32,6 +32,9 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
 - **21 thèmes de couleurs** et **31 fonds d'écran** du monde islamique (mosquées, faïences, déserts), ou un fond aléatoire
   qui change chaque jour. Photos de Wikimedia Commons sous licences libres, téléchargées à la compilation
   (`tools/wallpapers.json`) ; les crédits sont affichés dans Paramètres > Apparence.
+- **Smartphone et tablette** : écrans adaptés au format portrait et au tactile, position GPS, pavé tactile pour le code
+  de déblocage. Pendant le blocage, les appels restent possibles (l'écran se retire pendant un appel) et un bouton
+  « Appel d'urgence » ouvre le composeur.
 - Reprogrammation automatique après redémarrage de la TV, changement d'heure ou de fuseau.
 
 ## Obtenir l'APK sans rien installer (GitHub, gratuit)

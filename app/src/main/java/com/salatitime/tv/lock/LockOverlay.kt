@@ -1,6 +1,8 @@
 package com.salatitime.tv.lock
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.provider.Settings
@@ -25,7 +27,11 @@ import com.salatitime.tv.ui.theme.ThemeEngine
  * ▲▼ pour changer le chiffre, ◀▶ pour se déplacer, OK pour valider
  * (ou touches numériques de la télécommande).
  */
-class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
+class LockOverlay(
+    context: Context,
+    private val onCode: (String) -> Boolean,
+    private val onEmergency: () -> Unit = {},
+) {
 
     private val ctx = context.applicationContext
     private val wm = ctx.getSystemService(WindowManager::class.java)
@@ -43,6 +49,14 @@ class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
     private val refTv = text(16f, th.accent)
     private var attached = false
     private var hasCode = false
+    private var hasHadith = false
+
+    /** Téléphone / tablette : saisie au doigt et bouton d'appel d'urgence. */
+    private val touch = !ctx.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK) &&
+        ctx.packageManager.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN)
+    private val portrait = ctx.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    private val keypad = LinearLayout(ctx)
+    private val emergencyTv = text(16f, th.text)
 
     // Saisie du code : chiffres validés + chiffre en cours de réglage (▲▼)
     private var pinMode = false
@@ -58,10 +72,10 @@ class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
         val col = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            // zone sûre des TV (overscan)
-            setPadding(dp(56), dp(28), dp(56), dp(24))
+            // zone sûre des TV (overscan) ; marges réduites sur téléphone
+            if (portrait) setPadding(dp(16), dp(40), dp(16), dp(20)) else setPadding(dp(56), dp(28), dp(56), dp(24))
         }
-        col.addView(text(34f, th.accent).apply { this.text = "🕌  حي على الصلاة" })
+        col.addView(text(if (portrait) 28f else 34f, th.accent).apply { this.text = "🕌  حي على الصلاة" })
         col.addView(titleTv.apply { setPadding(0, dp(4), 0, dp(10)) })
 
         // Hadith : arabe (de droite à gauche), traduction, référence ; la taille s'adapte à la longueur
@@ -69,7 +83,7 @@ class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             background = ThemeEngine.panelDrawable(ctx)
-            setPadding(dp(36), dp(18), dp(36), dp(14))
+            if (portrait) setPadding(dp(14), dp(12), dp(14), dp(10)) else setPadding(dp(36), dp(18), dp(36), dp(14))
             visibility = View.GONE
         }
         arabicTv.apply {
@@ -88,21 +102,78 @@ class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
         col.addView(spacer, LinearLayout.LayoutParams(1, 0, 1f))
 
         col.addView(text(20f, th.text).apply {
-            this.text = "La TV est en pause. Elle sera disponible dans :"
+            this.text = if (touch) "Pause pendant la prière. Disponible dans :" else "La TV est en pause. Elle sera disponible dans :"
             setPadding(0, dp(14), 0, 0)
         })
         col.addView(countdownTv)
         col.addView(untilTv)
         col.addView(pinTv.apply { setPadding(0, dp(10), 0, 0); visibility = View.GONE })
-        col.addView(hintTv.apply { setPadding(0, dp(6), 0, 0) })
+        if (touch) {
+            buildKeypad()
+            col.addView(keypad, LinearLayout.LayoutParams(dp(280), LinearLayout.LayoutParams.WRAP_CONTENT).apply { gravity = Gravity.CENTER_HORIZONTAL })
+            hintTv.setOnClickListener {
+                if (hasCode && !pinMode) { pinMode = true; resetPin(); renderPin() }
+            }
+        }
+        col.addView(hintTv.apply { setPadding(0, dp(10), 0, dp(4)) })
+        if (touch) {
+            col.addView(emergencyTv.apply {
+                text = "📞  Appel d'urgence"
+                background = ThemeEngine.buttonDrawable(ctx)
+                setPadding(dp(22), dp(10), dp(22), dp(10))
+                setOnClickListener { onEmergency() }
+            }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                gravity = Gravity.CENTER_HORIZONTAL; topMargin = dp(8)
+            })
+        }
         root.addView(col, FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
         ))
         root.onKey = ::handleKey
     }
 
+    /** Pavé numérique tactile pour le code de déblocage (téléphone). */
+    private fun buildKeypad() {
+        keypad.orientation = LinearLayout.VERTICAL
+        keypad.visibility = View.GONE
+        val rows = listOf(listOf("1", "2", "3"), listOf("4", "5", "6"), listOf("7", "8", "9"), listOf("⌫", "0", "OK"))
+        for (r in rows) {
+            val line = LinearLayout(ctx).apply { orientation = LinearLayout.HORIZONTAL }
+            for (k in r) {
+                val key = text(24f, th.text, bold = true).apply {
+                    text = k
+                    background = ThemeEngine.buttonDrawable(ctx)
+                    setPadding(0, dp(10), 0, dp(10))
+                    setOnClickListener { touchKey(k) }
+                }
+                line.addView(key, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    setMargins(dp(5), dp(5), dp(5), dp(5))
+                })
+            }
+            keypad.addView(line)
+        }
+        keypad.addView(text(16f, th.textDim).apply {
+            text = "Annuler"
+            setPadding(0, dp(8), 0, dp(4))
+            setOnClickListener { pinMode = false; renderPin() }
+        })
+    }
+
+    private fun touchKey(k: String) {
+        when (k) {
+            "⌫" -> if (digits.isNotEmpty()) digits.removeAt(digits.lastIndex)
+            "OK" -> {
+                if (!onCode(digits.joinToString(""))) { resetPin(); renderPin("❌ Code incorrect") }
+                return
+            }
+            else -> if (digits.size < maxDigits) digits += k.toInt()
+        }
+        renderPin()
+    }
+
     /** Affiche (ou masque, si null) le hadith. */
     fun setHadith(h: Hadith?) {
+        hasHadith = h != null
         if (h == null) {
             hadithBox.visibility = View.GONE
             spacer.visibility = View.VISIBLE
@@ -206,6 +277,20 @@ class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
     }
 
     private fun renderPin(error: String? = null) {
+        if (touch) {
+            // Pendant la saisie au doigt, le pavé prend la place du hadith
+            keypad.visibility = if (pinMode) View.VISIBLE else View.GONE
+            hadithBox.visibility = if (hasHadith && !pinMode) View.VISIBLE else View.GONE
+            spacer.visibility = if (hasHadith && !pinMode) View.GONE else View.VISIBLE
+            pinTv.visibility = if (pinMode) View.VISIBLE else View.GONE
+            pinTv.text = if (digits.isEmpty()) "_ _ _ _" else digits.joinToString("  ") { "•" }
+            hintTv.text = when {
+                !hasCode -> ""
+                pinMode -> (error ?: "Saisissez le code de déblocage")
+                else -> "🔑  Touchez ici pour saisir le code de déblocage"
+            }
+            return
+        }
         if (!hasCode) {
             pinTv.visibility = View.GONE
             hintTv.text = ""
