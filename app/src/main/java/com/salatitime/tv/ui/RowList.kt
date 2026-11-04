@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.salatitime.tv.R
+import com.salatitime.tv.ui.theme.ThemeEngine
 
 /** Liste verticale de lignes « Titre … Valeur », navigable à la télécommande (D-pad). */
 class RowList(private val container: LinearLayout) {
@@ -14,6 +15,7 @@ class RowList(private val container: LinearLayout) {
     fun header(text: String) {
         val v = inflater.inflate(R.layout.item_header, container, false) as TextView
         v.text = text
+        ThemeEngine.style(v)
         container.addView(v)
     }
 
@@ -26,6 +28,7 @@ class RowList(private val container: LinearLayout) {
         refresh()
         refreshers += refresh
         v.setOnClickListener { onClick() }
+        ThemeEngine.style(v)
         container.addView(v)
         return v
     }

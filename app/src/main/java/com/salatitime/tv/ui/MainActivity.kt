@@ -19,6 +19,7 @@ import com.salatitime.tv.alarm.PrayerScheduler
 import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.prayer.AlertMode
 import com.salatitime.tv.prayer.Prayer
+import com.salatitime.tv.ui.theme.ThemeEngine
 import java.time.Duration
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         prefs = Prefs(this)
+        ThemeEngine.applyWindow(this, scrim = 0.55f)
 
         clock = findViewById(R.id.clock)
         dateTv = findViewById(R.id.date)
@@ -69,6 +71,7 @@ class MainActivity : AppCompatActivity() {
             row.addView(card)
             cards[p] = card
         }
+        ThemeEngine.style(findViewById(android.R.id.content))
 
         findViewById<View>(R.id.btnLocation).setOnClickListener { LocationDialogs.show(this, prefs) { refreshTimes() } }
         findViewById<View>(R.id.btnSettings).setOnClickListener { startActivity(Intent(this, SettingsActivity::class.java)) }
@@ -81,8 +84,14 @@ class MainActivity : AppCompatActivity() {
         cards[Prayer.FAJR]?.requestFocus()
     }
 
+    private var appliedLook = ""
+
     override fun onResume() {
         super.onResume()
+        // Thème ou fond d'écran changé dans les paramètres : redessiner l'écran
+        val look = prefs.themeId + "|" + prefs.wallpaperId
+        if (appliedLook.isNotEmpty() && look != appliedLook) { recreate(); return }
+        appliedLook = look
         refreshTimes()
         handler.post(ticker)
         com.salatitime.tv.lock.LockManager.ensureRunning(this)
@@ -166,7 +175,7 @@ class MainActivity : AppCompatActivity() {
         if (highlight != highlighted) {
             highlighted = highlight
             for ((prayer, card) in cards) {
-                card.setBackgroundResource(if (prayer == highlight) R.drawable.bg_card_next else R.drawable.bg_card)
+                card.background = ThemeEngine.cardDrawable(this, next = prayer == highlight)
             }
         }
     }

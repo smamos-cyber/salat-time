@@ -13,12 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: pip install --quiet pillow
-      - run: python3 tools/fetch_wallpapers.py wallpapers
-      - run: python3 tools/contact_sheets.py wallpapers apercus
-      - name: Publier les aperçus sur la branche apercus-fonds-ecran
+      - run: python3 tools/probe_mawaqit.py apercus
+      - name: Publier les aperçus sur la branche apercus-mawaqit
         run: |
           cd apercus
-          git init -q -b apercus-fonds-ecran
+          git init -q -b apercus-mawaqit
           git config user.name "github-actions"; git config user.email "actions@github.com"
-          git add -A && git commit -q -m "Aperçus des fonds d'écran candidats"
-          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" apercus-fonds-ecran
+          git add -A && git commit -q -m "Échantillons Mawaqit"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" apercus-mawaqit

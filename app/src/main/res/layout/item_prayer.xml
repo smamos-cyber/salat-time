@@ -5,6 +5,7 @@
     android:layout_weight="1"
     android:layout_margin="8dp"
     android:background="@drawable/bg_card"
+    android:tag="card"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center"

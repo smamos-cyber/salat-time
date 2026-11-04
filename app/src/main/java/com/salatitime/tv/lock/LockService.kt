@@ -15,6 +15,7 @@ import androidx.core.app.ServiceCompat
 import com.salatitime.tv.R
 import com.salatitime.tv.SalatiApp
 import com.salatitime.tv.alarm.AlertService
+import com.salatitime.tv.data.HadithRepository
 import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.prayer.Prayer
 import com.salatitime.tv.ui.Format
@@ -71,6 +72,7 @@ class LockService : Service() {
             if (tickCount % 10 == 0) requestFocus()
         }
         if (!ov.isShown()) {
+            ov.setHadith(if (prefs.showHadith) HadithRepository.get(this, prefs.lockHadith) else null)
             ov.show(prefs.unlockCode.isNotEmpty())
             // L'adhan en cours reste visible et contrôlable au-dessus de l'écran de blocage
             if (alertPlaying) AlertService.raiseOverlay()

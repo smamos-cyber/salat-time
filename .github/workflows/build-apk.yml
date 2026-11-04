@@ -2,7 +2,11 @@ name: Compiler l'APK
 
 on:
   push:
+<<<<<<< HEAD
     branches-ignore: ['outils-*']
+=======
+    branches-ignore: ['outils-*', 'apercus-*']
+>>>>>>> main
   workflow_dispatch:
 
 permissions:
@@ -33,6 +37,9 @@ jobs:
           mkdir -p app/src/main/res/raw
           curl -fL --retry 3 -A "Mozilla/5.0" -o app/src/main/res/raw/adhan_default.mp3 https://www.islamcan.com/audio/adhan/azan1.mp3
           ls -la app/src/main/res/raw
+
+      - name: Télécharger les fonds d'écran (Wikimedia Commons)
+        run: python3 tools/download_wallpapers.py
 
       - name: Compiler
         run: |

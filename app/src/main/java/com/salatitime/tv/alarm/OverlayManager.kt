@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.salatitime.tv.R
+import com.salatitime.tv.ui.theme.ThemeEngine
 
 /**
  * Affiche une fenêtre par-dessus n'importe quelle application (Netflix, YouTube, chaîne TV…).
@@ -33,6 +34,7 @@ class OverlayManager(context: Context) {
         val v = LayoutInflater.from(ctx).inflate(R.layout.overlay_banner, null)
         v.findViewById<TextView>(R.id.overlayTitle).text = title
         v.findViewById<TextView>(R.id.overlaySubtitle).text = subtitle
+        ThemeEngine.style(v)
         val lp = baseParams(
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
@@ -52,6 +54,7 @@ class OverlayManager(context: Context) {
         LayoutInflater.from(ctx).inflate(R.layout.overlay_adhan, root, true)
         root.findViewById<TextView>(R.id.overlayTitle).text = title
         root.findViewById<TextView>(R.id.overlaySubtitle).text = subtitle
+        ThemeEngine.style(root)
         val stop = root.findViewById<Button>(R.id.overlayStop)
         stop.setOnClickListener { onStop() }
         val lp = baseParams(
