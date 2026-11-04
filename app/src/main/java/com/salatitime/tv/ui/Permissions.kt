@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
+import android.annotation.SuppressLint
 
 object Permissions {
 
@@ -32,6 +34,18 @@ object Permissions {
         val generic = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
         if (!tryStart(a, specific) && !tryStart(a, generic)) {
             a.info("Autorisation à activer manuellement", adbHelp(a))
+        }
+    }
+
+    /** Téléphone : sans cette exemption, certains fabricants retardent ou suppriment les alarmes. */
+    fun ignoresBatteryOptimizations(ctx: Context): Boolean =
+        ctx.getSystemService(PowerManager::class.java)?.isIgnoringBatteryOptimizations(ctx.packageName) ?: true
+
+    @SuppressLint("BatteryLife")
+    fun requestIgnoreBatteryOptimizations(a: Activity) {
+        val i = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${a.packageName}"))
+        if (!tryStart(a, i) && !tryStart(a, Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))) {
+            a.info("Batterie", "Ouvrez Paramètres > Applications > Salati Time > Batterie et choisissez « Non restreinte ».")
         }
     }
 

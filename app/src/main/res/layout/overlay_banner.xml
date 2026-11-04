@@ -24,7 +24,7 @@
             android:id="@+id/overlayTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="560dp"
+            android:maxWidth="@dimen/overlay_text_max"
             android:textColor="@color/text"
             android:textSize="22sp"
             android:textStyle="bold" />

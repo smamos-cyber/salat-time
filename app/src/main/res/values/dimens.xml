@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TV / paysage : zone sûre recommandée pour les téléviseurs (overscan) -->
+    <dimen name="screen_pad_h">48dp</dimen>
+    <dimen name="screen_pad_v">27dp</dimen>
+    <dimen name="overlay_min_width">560dp</dimen>
+    <dimen name="overlay_text_max">560dp</dimen>
+    <dimen name="btn_min_width">180dp</dimen>
+    <dimen name="btn_margin">10dp</dimen>
+    <dimen name="row_value_max">520dp</dimen>
+</resources>
