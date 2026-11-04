@@ -2,6 +2,7 @@ name: Compiler l'APK
 
 on:
   push:
+    branches-ignore: ['outils-*', 'apercus-*']
   workflow_dispatch:
 
 permissions:
@@ -33,6 +34,9 @@ jobs:
           curl -fL --retry 3 -A "Mozilla/5.0" -o app/src/main/res/raw/adhan_default.mp3 https://www.islamcan.com/audio/adhan/azan1.mp3
           ls -la app/src/main/res/raw
 
+      - name: Télécharger les fonds d'écran (Wikimedia Commons)
+        run: python3 tools/download_wallpapers.py
+
       - name: Compiler
         run: |
           gradle assembleRelease --stacktrace --no-daemon
@@ -45,6 +49,7 @@ jobs:
           path: SalatiTime.apk
 
       - name: Publier dans « Releases » (lien direct, pratique depuis la TV)
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}

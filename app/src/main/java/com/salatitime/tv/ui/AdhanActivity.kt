@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.salatitime.tv.R
+import com.salatitime.tv.ui.theme.ThemeEngine
 import com.salatitime.tv.alarm.PrayerScheduler
 import com.salatitime.tv.data.AdhanRepository
 import com.salatitime.tv.data.AdhanSound
@@ -47,6 +48,8 @@ class AdhanActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
+        ThemeEngine.applyWindow(this, scrim = 0.78f)
+        ThemeEngine.style(findViewById(android.R.id.content))
         findViewById<TextView>(R.id.screenTitle).text = "Appels à la prière"
         prefs = Prefs(this)
         rows = RowList(findViewById<LinearLayout>(R.id.container))

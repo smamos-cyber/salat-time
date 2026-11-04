@@ -1,7 +1,6 @@
 package com.salatitime.tv.lock
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.provider.Settings
@@ -12,8 +11,11 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import com.salatitime.tv.R
+import android.util.TypedValue
+import androidx.core.graphics.ColorUtils
+import androidx.core.widget.TextViewCompat
+import com.salatitime.tv.data.Hadith
+import com.salatitime.tv.ui.theme.ThemeEngine
 
 /**
  * Écran plein écran affiché par-dessus toutes les applications.
@@ -28,11 +30,17 @@ class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
     private val ctx = context.applicationContext
     private val wm = ctx.getSystemService(WindowManager::class.java)
     private val root = KeyLayout(ctx)
-    private val titleTv = text(30f, R.color.gold_soft)
-    private val countdownTv = text(96f, R.color.text, bold = true)
-    private val untilTv = text(22f, R.color.text_dim)
-    private val hintTv = text(18f, R.color.text_dim)
-    private val pinTv = text(44f, R.color.gold, bold = true)
+    private val th = ThemeEngine.theme(ctx)
+    private val titleTv = text(24f, th.accentSoft)
+    private val countdownTv = text(58f, th.text, bold = true)
+    private val untilTv = text(18f, th.textDim)
+    private val hintTv = text(16f, th.textDim)
+    private val pinTv = text(40f, th.accent, bold = true)
+    private val hadithBox = LinearLayout(ctx)
+    private val spacer = View(ctx)
+    private val arabicTv = text(26f, th.text)
+    private val frenchTv = text(20f, th.text)
+    private val refTv = text(16f, th.accent)
     private var attached = false
     private var hasCode = false
 
@@ -44,27 +52,70 @@ class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
     private val maxDigits = 8
 
     init {
-        root.setBackgroundColor(Color.parseColor("#F2061418"))
+        root.background = ThemeEngine.background(ctx, scrim = 0.80f)
         root.isFocusable = true
         root.isFocusableInTouchMode = true
         val col = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
+            // zone sûre des TV (overscan)
+            setPadding(dp(56), dp(28), dp(56), dp(24))
         }
-        col.addView(text(40f, R.color.gold).apply { this.text = "🕌  حي على الصلاة" })
-        col.addView(titleTv.apply { setPadding(0, dp(16), 0, 0) })
-        col.addView(text(24f, R.color.text).apply {
+        col.addView(text(34f, th.accent).apply { this.text = "🕌  حي على الصلاة" })
+        col.addView(titleTv.apply { setPadding(0, dp(4), 0, dp(10)) })
+
+        // Hadith : arabe (de droite à gauche), traduction, référence ; la taille s'adapte à la longueur
+        hadithBox.apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            background = ThemeEngine.panelDrawable(ctx)
+            setPadding(dp(36), dp(18), dp(36), dp(14))
+            visibility = View.GONE
+        }
+        arabicTv.apply {
+            textDirection = View.TEXT_DIRECTION_RTL
+            layoutDirection = View.LAYOUT_DIRECTION_RTL
+            setLineSpacing(0f, 1.25f)
+        }
+        frenchTv.setLineSpacing(0f, 1.15f)
+        hadithBox.addView(arabicTv, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.15f))
+        hadithBox.addView(View(ctx).apply { setBackgroundColor(ColorUtils.setAlphaComponent(th.accent, 0x66)) },
+            LinearLayout.LayoutParams(dp(220), dp(1)).apply { setMargins(0, dp(10), 0, dp(10)); gravity = Gravity.CENTER })
+        hadithBox.addView(frenchTv, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
+        hadithBox.addView(refTv.apply { setPadding(0, dp(8), 0, 0) })
+        col.addView(hadithBox, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
+        // Sans hadith, l'espace vide centre le compte à rebours
+        col.addView(spacer, LinearLayout.LayoutParams(1, 0, 1f))
+
+        col.addView(text(20f, th.text).apply {
             this.text = "La TV est en pause. Elle sera disponible dans :"
-            setPadding(0, dp(36), 0, 0)
+            setPadding(0, dp(14), 0, 0)
         })
         col.addView(countdownTv)
         col.addView(untilTv)
-        col.addView(pinTv.apply { setPadding(0, dp(28), 0, 0); visibility = View.GONE })
-        col.addView(hintTv.apply { setPadding(0, dp(20), 0, 0) })
+        col.addView(pinTv.apply { setPadding(0, dp(10), 0, 0); visibility = View.GONE })
+        col.addView(hintTv.apply { setPadding(0, dp(6), 0, 0) })
         root.addView(col, FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER
+            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
         ))
         root.onKey = ::handleKey
+    }
+
+    /** Affiche (ou masque, si null) le hadith. */
+    fun setHadith(h: Hadith?) {
+        if (h == null) {
+            hadithBox.visibility = View.GONE
+            spacer.visibility = View.VISIBLE
+            return
+        }
+        hadithBox.visibility = View.VISIBLE
+        spacer.visibility = View.GONE
+        arabicTv.text = h.arabic
+        frenchTv.text = h.french
+        refTv.text = h.reference
+        // La taille du texte s'ajuste pour que le hadith tienne entièrement dans son cadre
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(arabicTv, 14, 34, 1, TypedValue.COMPLEX_UNIT_SP)
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(frenchTv, 12, 26, 1, TypedValue.COMPLEX_UNIT_SP)
     }
 
     fun isShown(): Boolean = attached && root.isAttachedToWindow
@@ -174,9 +225,9 @@ class LockOverlay(context: Context, private val onCode: (String) -> Boolean) {
 
     // ---------- Vues ----------
 
-    private fun text(sizeSp: Float, colorRes: Int, bold: Boolean = false) = TextView(ctx).apply {
+    private fun text(sizeSp: Float, color: Int, bold: Boolean = false) = TextView(ctx).apply {
         textSize = sizeSp
-        setTextColor(ContextCompat.getColor(ctx, colorRes))
+        setTextColor(color)
         gravity = Gravity.CENTER
         if (bold) setTypeface(typeface, Typeface.BOLD)
     }

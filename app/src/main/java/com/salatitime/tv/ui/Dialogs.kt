@@ -5,6 +5,7 @@ import android.text.InputType
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
+import com.salatitime.tv.ui.theme.ThemeEngine
 
 fun Context.choose(title: String, items: List<String>, checked: Int = -1, onPick: (Int) -> Unit) {
     AlertDialog.Builder(this)
@@ -15,6 +16,7 @@ fun Context.choose(title: String, items: List<String>, checked: Int = -1, onPick
         }
         .setNegativeButton("Annuler", null)
         .show()
+        .also { ThemeEngine.styleDialog(it) }
 }
 
 fun Context.askText(
@@ -22,6 +24,7 @@ fun Context.askText(
     hint: String,
     initial: String = "",
     inputType: Int = InputType.TYPE_CLASS_TEXT,
+    allowEmpty: Boolean = false,
     onOk: (String) -> Unit
 ) {
     val pad = (24 * resources.displayMetrics.density).toInt()
@@ -41,10 +44,11 @@ fun Context.askText(
         .setView(box)
         .setPositiveButton("OK") { _, _ ->
             val v = input.text.toString().trim()
-            if (v.isNotEmpty()) onOk(v)
+            if (v.isNotEmpty() || allowEmpty) onOk(v)
         }
         .setNegativeButton("Annuler", null)
         .show()
+        .also { ThemeEngine.styleDialog(it) }
     input.requestFocus()
 }
 
@@ -54,6 +58,7 @@ fun Context.info(title: String, message: String) {
         .setMessage(message)
         .setPositiveButton("OK", null)
         .show()
+        .also { ThemeEngine.styleDialog(it) }
 }
 
 fun Context.progressDialog(message: String): AlertDialog =
@@ -62,3 +67,4 @@ fun Context.progressDialog(message: String): AlertDialog =
         .setMessage(message)
         .setCancelable(false)
         .show()
+        .also { ThemeEngine.styleDialog(it) }

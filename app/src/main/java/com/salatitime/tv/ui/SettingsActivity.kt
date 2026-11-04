@@ -8,6 +8,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.salatitime.tv.R
+import com.salatitime.tv.ui.theme.AppTheme
+import com.salatitime.tv.ui.theme.ThemeEngine
+import com.salatitime.tv.ui.theme.Wallpapers
 import com.salatitime.tv.alarm.AlarmReceiver
 import com.salatitime.tv.alarm.AlertService
 import com.salatitime.tv.alarm.PrayerScheduler
@@ -27,6 +30,8 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
+        ThemeEngine.applyWindow(this, scrim = 0.78f)
+        ThemeEngine.style(findViewById(android.R.id.content))
         findViewById<TextView>(R.id.screenTitle).text = "Paramètres"
         prefs = Prefs(this)
         rows = RowList(findViewById<LinearLayout>(R.id.container))
@@ -89,6 +94,22 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
         rows.row("🧪  Tester le réveil de la TV", { "adhan dans 1 minute" }) { scheduleWakeTest() }
+        rows.header("Apparence")
+        rows.row("🎨  Thème", { ThemeEngine.theme(this).name }) {
+            val all = AppTheme.ALL
+            choose("Thème (${all.size} au choix)", all.map { it.name }, all.indexOfFirst { it.id == prefs.themeId }) {
+                prefs.themeId = all[it].id; recreate()
+            }
+        }
+        rows.row("🖼  Fond d'écran", { wallpaperLabel() }) {
+            val ids = listOf("", Wallpapers.RANDOM) + Wallpapers.ALL.map { it.id }
+            val labels = listOf("Aucun (dégradé du thème)", "Aléatoire (change chaque jour)") + Wallpapers.ALL.map { it.name }
+            choose("Fond d'écran", labels, ids.indexOf(prefs.wallpaperId)) {
+                prefs.wallpaperId = ids[it]; recreate()
+            }
+        }
+        rows.row("ℹ️  Crédits des photos") { info("Crédits des photos", Wallpapers.credits()) }
+
         rows.header("Blocage de la TV pendant la prière")
         rows.row("🔒  Durée du blocage", { lockSummary() }) {
             info(
@@ -102,12 +123,18 @@ class SettingsActivity : AppCompatActivity() {
         rows.row("🔑  Code de déblocage d'urgence", {
             if (prefs.unlockCode.isEmpty()) "Aucun (déblocage impossible avant la fin)" else "Défini (${prefs.unlockCode.length} chiffres)"
         }) {
-            askText("Code de déblocage (4 à 8 chiffres, vide = aucun)", "1234", inputType = PIN_INPUT) { code ->
+            askText("Code de déblocage (4 à 8 chiffres, vide = aucun)", "1234", inputType = PIN_INPUT, allowEmpty = true) { code ->
                 val c = code.trim()
                 if (c.isEmpty() || c.matches(Regex("\\d{4,8}"))) {
                     prefs.unlockCode = c; rows.refresh()
                 } else info("Code invalide", "Le code doit contenir de 4 à 8 chiffres.")
             }
+        }
+        rows.row("📖  Hadith sur l'écran de blocage", {
+            if (prefs.showHadith) "Oui (arabe + français)" else "Non"
+        }) {
+            choose("Afficher un hadith pendant le blocage", listOf("Oui (arabe + français)", "Non"),
+                if (prefs.showHadith) 0 else 1) { prefs.showHadith = it == 0; rows.refresh() }
         }
         rows.row("🧪  Tester le blocage", { "1 minute" }) {
             LockManager.start(this, Prayer.DHUHR, 1)
@@ -161,6 +188,12 @@ class SettingsActivity : AppCompatActivity() {
             "Éteignez maintenant la TV avec la télécommande (mise en veille, sans la débrancher).\n\n" +
                 "Dans 1 minute, elle devrait se rallumer et jouer l'adhan."
         )
+    }
+
+    private fun wallpaperLabel(): String = when (prefs.wallpaperId) {
+        "" -> "Aucun"
+        Wallpapers.RANDOM -> "Aléatoire" + (ThemeEngine.wallpaper(this)?.let { " (aujourd'hui : ${it.name})" } ?: "")
+        else -> Wallpapers.ALL.firstOrNull { it.id == prefs.wallpaperId }?.name ?: "Aucun"
     }
 
     private fun lockSummary(): String {

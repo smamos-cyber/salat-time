@@ -115,6 +115,24 @@ class Prefs(context: Context) {
         get() = sp.getString("unlockCode", "") ?: ""
         set(v) = sp.edit { putString("unlockCode", v) }
 
+    /** Hadith affiché pendant le blocage en cours (index dans assets/hadiths.json). */
+    var lockHadith: Int
+        get() = sp.getInt("lockHadith", -1)
+        set(v) = sp.edit(commit = true) { putInt("lockHadith", v) }
+    var showHadith: Boolean
+        get() = sp.getBoolean("showHadith", true)
+        set(v) = sp.edit { putBoolean("showHadith", v) }
+
+    // ---------- Apparence ----------
+    var themeId: String
+        get() = sp.getString("theme", "emeraude") ?: "emeraude"
+        set(v) = sp.edit { putString("theme", v) }
+
+    /** Fond d'écran : "" = dégradé du thème, "random" = change chaque jour, sinon identifiant de l'image. */
+    var wallpaperId: String
+        get() = sp.getString("wallpaper", "random") ?: "random"
+        set(v) = sp.edit { putString("wallpaper", v) }
+
     var overlayHintShown: Boolean
         get() = sp.getBoolean("overlayHint", false)
         set(v) = sp.edit { putBoolean("overlayHint", v) }
