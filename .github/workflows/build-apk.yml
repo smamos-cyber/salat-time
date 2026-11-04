@@ -2,11 +2,7 @@ name: Compiler l'APK
 
 on:
   push:
-<<<<<<< HEAD
-    branches-ignore: ['outils-*']
-=======
     branches-ignore: ['outils-*', 'apercus-*']
->>>>>>> main
   workflow_dispatch:
 
 permissions:
