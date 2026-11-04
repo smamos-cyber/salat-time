@@ -26,6 +26,12 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
 - **Blocage de la TV pendant la prière** : dès le début de l'adhan, écran plein écran avec compte à rebours, de 10 min à 2 h, réglable pour chaque prière.
   Le son est coupé et rien n'est utilisable. Le blocage reprend après extinction, redémarrage ou débranchement de la TV.
   Code de déblocage d'urgence facultatif.
+- **Hadith sur l'écran de blocage** : un hadith authentique en arabe avec sa traduction française et sa référence,
+  choisi parmi une sélection de Sahih al-Bukhari, Sahih Muslim, des 40 hadiths an-Nawawi et des hadiths qudsi
+  (données : [fawazahmed0/hadith-api](https://github.com/fawazahmed0/hadith-api), domaine public ; voir `tools/build_hadith.py`).
+- **21 thèmes de couleurs** et **31 fonds d'écran** du monde islamique (mosquées, faïences, déserts), ou un fond aléatoire
+  qui change chaque jour. Photos de Wikimedia Commons sous licences libres, téléchargées à la compilation
+  (`tools/wallpapers.json`) ; les crédits sont affichés dans Paramètres > Apparence.
 - Reprogrammation automatique après redémarrage de la TV, changement d'heure ou de fuseau.
 
 ## Obtenir l'APK sans rien installer (GitHub, gratuit)

@@ -5,6 +5,7 @@ import android.media.AudioManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import android.content.Intent
+import com.salatitime.tv.data.HadithRepository
 import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.prayer.Prayer
 
@@ -48,6 +49,8 @@ object LockManager {
         val prefs = Prefs(ctx)
         val until = System.currentTimeMillis() + minutes * 60_000L
         if (until > prefs.lockUntil) {
+            // Nouveau blocage : nouveau hadith (conservé en cas de redémarrage de la TV)
+            if (!isActive(ctx)) prefs.lockHadith = HadithRepository.randomIndex(ctx, prefs.lockHadith)
             prefs.lockUntil = until
             prefs.lockDurationMin = minutes
             prefs.lockPrayer = prayer.name

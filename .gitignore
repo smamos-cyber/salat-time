@@ -9,3 +9,4 @@ captures/
 app/src/main/res/drawable-xhdpi/banner.png
 app/src/main/res/mipmap-*/ic_launcher.png
 app/src/main/res/raw/adhan_default.mp3
+app/src/main/res/drawable-nodpi/wp_*.jpg
