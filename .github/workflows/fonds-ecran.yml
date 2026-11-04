@@ -4,13 +4,21 @@ on:
   push:
     branches: ['outils-*']
 
+permissions:
+  contents: write
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: pip install --quiet pillow
       - run: python3 tools/fetch_wallpapers.py wallpapers
-      - uses: actions/upload-artifact@v4
-        with:
-          name: wallpapers
-          path: wallpapers
+      - run: python3 tools/contact_sheets.py wallpapers apercus
+      - name: Publier les aperçus sur la branche apercus-fonds-ecran
+        run: |
+          cd apercus
+          git init -q -b apercus-fonds-ecran
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add -A && git commit -q -m "Aperçus des fonds d'écran candidats"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" apercus-fonds-ecran
