@@ -1,0 +1,80 @@
+11-04 16:43:56.086   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{c4ce2d5 com.google.android.apps.photos/10136} BLOCKED
+11-04 16:43:56.086   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{462c780 com.google.android.calendar/10145} BLOCKED
+11-04 16:43:58.996   494   535 D ArtManagerInternalImpl: /data/misc/iorapd/com.salatitime.tv/7/com.salatitime.tv.ui.MainActivity/compiled_traces/compiled_trace.pb doesn't exist
+11-04 16:43:58.996   494   535 I ActivityTaskManager: Displayed com.salatitime.tv/.ui.MainActivity: +1s739ms
+11-04 16:44:00.528   494  2530 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{8901fa3 com.google.android.gm/10134} BLOCKED
+11-04 16:44:01.641  3962  4462 D ProfileInstaller: Installing profile for com.salatitime.tv
+11-04 16:44:02.889   427  3957 I iorapd  : Perfetto TraceBuffer saved to file: /data/misc/iorapd/com.salatitime.tv/7/com.salatitime.tv.ui.MainActivity/raw_traces/1793810642436019106.perfetto_trace.pb
+11-04 16:44:04.410   494  2527 I ActivityManager: Force stopping com.salatitime.tv appid=10167 user=0: from pid 4687
+11-04 16:44:04.411   494  2527 I ActivityManager: Killing 3962:com.salatitime.tv/u0a167 (adj 0): stop com.salatitime.tv due to from pid 4687
+11-04 16:44:04.411   494  2527 W ActivityTaskManager: Force removing ActivityRecord{d5e57f8 u0 com.salatitime.tv/.ui.MainActivity t10 f}}: app died, no saved state
+11-04 16:44:04.422   494   590 W InputDispatcher: channel 'fcabc32 com.salatitime.tv/com.salatitime.tv.ui.MainActivity (server)' ~ Consumer closed input channel or an error occurred.  events=0x9
+11-04 16:44:04.422   494   590 E InputDispatcher: channel 'fcabc32 com.salatitime.tv/com.salatitime.tv.ui.MainActivity (server)' ~ Channel is unrecoverably broken and will be disposed!
+11-04 16:44:04.424   494  2527 W InputDispatcher: Attempted to unregister already unregistered input channel 'fcabc32 com.salatitime.tv/com.salatitime.tv.ui.MainActivity (server)'
+11-04 16:44:04.852   494  1823 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=com.salatitime.tv/.ui.MainActivity} from uid 2000
+11-04 16:44:04.939  4738  4738 I m.salatitime.t: Late-enabling -Xcheck:jni
+11-04 16:44:04.972  4738  4738 I m.salatitime.t: Unquickening 12 vdex files!
+11-04 16:44:04.973  4738  4738 W m.salatitime.t: Unexpected CPU variant for X86 using defaults: x86_64
+11-04 16:44:04.977   494   537 I ActivityManager: Start proc 4738:com.salatitime.tv/u0a167 for pre-top-activity {com.salatitime.tv/com.salatitime.tv.ui.MainActivity}
+11-04 16:44:05.397  4738  4738 W m.salatitime.t: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (greylist, reflection, allowed)
+11-04 16:44:06.613   494  1128 I MediaFocusControl: requestAudioFocus() from uid/pid 10167/4738 clientId=android.media.AudioManager@883f22ecom.salatitime.tv.lock.LockService$$ExternalSyntheticLambda2@18c51cf callingPack=com.salatitime.tv req=1 flags=0x0 sdk=35
+11-04 16:44:06.648   494   494 D NotificationService: 0|com.salatitime.tv|43|null|10167: granting content://settings/system/notification_sound
+11-04 16:44:06.648   494   494 D NotificationService: 0|com.salatitime.tv|43|null|10167: granting content://settings/system/notification_sound
+11-04 16:44:07.014   494   535 D ArtManagerInternalImpl: /data/misc/iorapd/com.salatitime.tv/7/com.salatitime.tv.ui.MainActivity/compiled_traces/compiled_trace.pb doesn't exist
+11-04 16:44:07.029   494   535 I ActivityTaskManager: Displayed com.salatitime.tv/.ui.MainActivity: +1s595ms
+11-04 16:44:07.063   712   712 D InterruptionStateProvider: No bubble up: not allowed to bubble: 0|com.salatitime.tv|43|null|10167
+11-04 16:44:07.064   712   712 D InterruptionStateProvider: No heads up: unimportant notification: 0|com.salatitime.tv|43|null|10167
+11-04 16:44:07.074   712   712 D InterruptionStateProvider: No bubble up: not allowed to bubble: 0|com.salatitime.tv|43|null|10167
+11-04 16:44:07.074   712   712 D InterruptionStateProvider: No heads up: unimportant notification: 0|com.salatitime.tv|43|null|10167
+11-04 16:44:07.118  4738  4758 I m.salatitime.t: Background young concurrent copying GC freed 37954(2961KB) AllocSpace objects, 15(1172KB) LOS objects, 88% free, 3081KB/27MB, paused 22us total 145.242ms
+11-04 16:44:07.154   712   712 D InterruptionStateProvider: No alerting: filtered notification: 0|android|0|com.android.server.wm.AlertWindowNotification - com.salatitime.tv|1000
+11-04 16:44:07.154   712   712 D InterruptionStateProvider: No alerting: filtered notification: 0|android|0|com.android.server.wm.AlertWindowNotification - com.salatitime.tv|1000
+11-04 16:44:07.383   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{f93f734 com.google.android.youtube/10147} BLOCKED
+11-04 16:44:07.383   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{8901fa3 com.google.android.gm/10134} BLOCKED
+11-04 16:44:07.383   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{eb95ca3 com.google.android.setupwizard/10116} BLOCKED
+11-04 16:44:07.383   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{a1352a0 com.google.android.apps.wellbeing/10113} BLOCKED
+11-04 16:44:07.383   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{c78014c com.google.android.apps.maps/10137} BLOCKED
+11-04 16:44:07.383   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{8384ba0 com.google.android.videos/10143} BLOCKED
+11-04 16:44:07.383   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{83b9b0 com.google.android.projection.gearhead/10114} BLOCKED
+11-04 16:44:10.159   427  4732 I iorapd  : Perfetto TraceBuffer saved to file: /data/misc/iorapd/com.salatitime.tv/7/com.salatitime.tv.ui.MainActivity/raw_traces/1793810650154192859.perfetto_trace.pb
+11-04 16:44:10.551  4738  5277 D ProfileInstaller: Installing profile for com.salatitime.tv
+11-04 16:44:16.708   494   525 I MediaFocusControl: requestAudioFocus() from uid/pid 10167/4738 clientId=android.media.AudioManager@883f22ecom.salatitime.tv.lock.LockService$$ExternalSyntheticLambda2@18c51cf callingPack=com.salatitime.tv req=1 flags=0x0 sdk=35
+11-04 16:44:18.425   494  1292 I ActivityManager: Force stopping com.salatitime.tv appid=10167 user=0: from pid 5755
+11-04 16:44:18.425   494  1292 I ActivityManager: Killing 4738:com.salatitime.tv/u0a167 (adj 0): stop com.salatitime.tv due to from pid 5755
+11-04 16:44:18.443   494  1838 I WindowManager: WIN DEATH: Window{c8ecb22 u0 com.salatitime.tv/com.salatitime.tv.ui.MainActivity}
+11-04 16:44:18.446   494   590 W InputDispatcher: channel 'e463a03 com.salatitime.tv (server)' ~ Consumer closed input channel or an error occurred.  events=0x9
+11-04 16:44:18.446   494   590 E InputDispatcher: channel 'e463a03 com.salatitime.tv (server)' ~ Channel is unrecoverably broken and will be disposed!
+11-04 16:44:18.446   494   590 W InputDispatcher: channel 'c8ecb22 com.salatitime.tv/com.salatitime.tv.ui.MainActivity (server)' ~ Consumer closed input channel or an error occurred.  events=0x9
+11-04 16:44:18.446   494   590 E InputDispatcher: channel 'c8ecb22 com.salatitime.tv/com.salatitime.tv.ui.MainActivity (server)' ~ Channel is unrecoverably broken and will be disposed!
+11-04 16:44:18.447   494  1838 W InputDispatcher: Attempted to unregister already unregistered input channel 'c8ecb22 com.salatitime.tv/com.salatitime.tv.ui.MainActivity (server)'
+11-04 16:44:18.473   494  1839 I WindowManager: WIN DEATH: Window{e463a03 u0 com.salatitime.tv}
+11-04 16:44:18.474   494  1839 W InputDispatcher: Attempted to unregister already unregistered input channel 'e463a03 com.salatitime.tv (server)'
+11-04 16:44:18.482   494  1292 W ActivityTaskManager: Force removing ActivityRecord{112bba9 u0 com.salatitime.tv/.ui.MainActivity t11 f}}: app died, no saved state
+11-04 16:44:19.079   494  2523 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=com.salatitime.tv/.ui.MainActivity} from uid 2000
+11-04 16:44:19.129   494   537 I ActivityManager: Start proc 5783:com.salatitime.tv/u0a167 for pre-top-activity {com.salatitime.tv/com.salatitime.tv.ui.MainActivity}
+11-04 16:44:19.176  5783  5783 I m.salatitime.t: Late-enabling -Xcheck:jni
+11-04 16:44:19.185  5783  5783 I m.salatitime.t: Unquickening 12 vdex files!
+11-04 16:44:19.186  5783  5783 W m.salatitime.t: Unexpected CPU variant for X86 using defaults: x86_64
+11-04 16:44:19.702  5783  5783 W m.salatitime.t: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (greylist, reflection, allowed)
+11-04 16:44:20.850   494   535 D ArtManagerInternalImpl: /data/misc/iorapd/com.salatitime.tv/7/com.salatitime.tv.ui.MainActivity/compiled_traces/compiled_trace.pb doesn't exist
+11-04 16:44:20.856   494   535 I ActivityTaskManager: Displayed com.salatitime.tv/.ui.MainActivity: +1s742ms
+11-04 16:44:20.894   494  2523 I MediaFocusControl: requestAudioFocus() from uid/pid 10167/5783 clientId=android.media.AudioManager@f146ca9com.salatitime.tv.lock.LockService$$ExternalSyntheticLambda2@883f22e callingPack=com.salatitime.tv req=1 flags=0x0 sdk=35
+11-04 16:44:21.041   494   494 D NotificationService: 0|com.salatitime.tv|43|null|10167: granting content://settings/system/notification_sound
+11-04 16:44:21.041   494   494 D NotificationService: 0|com.salatitime.tv|43|null|10167: granting content://settings/system/notification_sound
+11-04 16:44:21.114   712   712 D InterruptionStateProvider: No bubble up: not allowed to bubble: 0|com.salatitime.tv|43|null|10167
+11-04 16:44:21.114   712   712 D InterruptionStateProvider: No heads up: unimportant notification: 0|com.salatitime.tv|43|null|10167
+11-04 16:44:21.151   712   712 D InterruptionStateProvider: No bubble up: not allowed to bubble: 0|com.salatitime.tv|43|null|10167
+11-04 16:44:21.151   712   712 D InterruptionStateProvider: No heads up: unimportant notification: 0|com.salatitime.tv|43|null|10167
+11-04 16:44:21.369   712   712 D InterruptionStateProvider: No alerting: filtered notification: 0|android|0|com.android.server.wm.AlertWindowNotification - com.salatitime.tv|1000
+11-04 16:44:21.369   712   712 D InterruptionStateProvider: No alerting: filtered notification: 0|android|0|com.android.server.wm.AlertWindowNotification - com.salatitime.tv|1000
+11-04 16:44:21.390  5783  5798 I m.salatitime.t: Background young concurrent copying GC freed 39970(3072KB) AllocSpace objects, 13(1068KB) LOS objects, 88% free, 3080KB/27MB, paused 23us total 196.080ms
+11-04 16:44:22.304   494  5859 I PackageDexOptimizer: Running dexopt (dexoptNeeded=1) on: /data/app/~~IVu0Xc0lNUe7jgzeOvSD5A==/com.salatitime.tv-pkkEJlys5iiXVe8yYNeyBg==/base.apk pkg=com.salatitime.tv isa=x86_64 dexoptFlags=boot_complete,debuggable,public,enable_hidden_api_checks targetFilter=verify oatDir=/data/app/~~IVu0Xc0lNUe7jgzeOvSD5A==/com.salatitime.tv-pkkEJlys5iiXVe8yYNeyBg==/oat classLoaderContext=PCL[]{}
+11-04 16:44:22.309   425   563 V installd: DexInv: --- BEGIN '/data/app/~~IVu0Xc0lNUe7jgzeOvSD5A==/com.salatitime.tv-pkkEJlys5iiXVe8yYNeyBg==/base.apk' ---
+11-04 16:44:22.652  5864  5864 I dex2oat32: /apex/com.android.art/bin/dex2oat32 --input-vdex-fd=-1 --output-vdex-fd=9 --updatable-bcp-packages-file=/system/etc/updatable-bcp-packages.txt --resolve-startup-const-strings=true --max-image-block-size=524288 --compiler-filter=verify --debuggable --classpath-dir=/data/app/~~IVu0Xc0lNUe7jgzeOvSD5A==/com.salatitime.tv-pkkEJlys5iiXVe8yYNeyBg== --class-loader-context=PCL[]{} --generate-mini-debug-info --compact-dex-level=none --compilation-reason=boot
+11-04 16:44:24.643   427  5780 I iorapd  : Perfetto TraceBuffer saved to file: /data/misc/iorapd/com.salatitime.tv/7/com.salatitime.tv.ui.MainActivity/raw_traces/1793810664353137419.perfetto_trace.pb
+11-04 16:44:25.303  5783  5898 D ProfileInstaller: Installing profile for com.salatitime.tv
+11-04 16:44:26.570   425   563 V installd: DexInv: --- END '/data/app/~~IVu0Xc0lNUe7jgzeOvSD5A==/com.salatitime.tv-pkkEJlys5iiXVe8yYNeyBg==/base.apk' (success) ---
+11-04 16:44:26.869   494  5859 I BackgroundDexOptService: Pinning optimized code {com.salatitime.tv, android}
+11-04 16:44:26.869   494  5859 D IorapForwardingService: onPackagesUpdated: com.salatitime.tv
+11-04 16:44:31.063   494  1808 I MediaFocusControl: requestAudioFocus() from uid/pid 10167/5783 clientId=android.media.AudioManager@f146ca9com.salatitime.tv.lock.LockService$$ExternalSyntheticLambda2@883f22e callingPack=com.salatitime.tv req=1 flags=0x0 sdk=35
+11-04 16:44:31.758   494   552 I AppsFilter: interaction: PackageSetting{258ea07 com.salatitime.tv/10167} -> PackageSetting{8901fa3 com.google.android.gm/10134} BLOCKED
