@@ -25,7 +25,8 @@ class AlarmReceiver : BroadcastReceiver() {
                     ?.let { n -> AlertMode.entries.firstOrNull { it.name == n } }
                 AlertService.start(
                     context, prayer, pre, time, force,
-                    forceWake = intent.getBooleanExtra(AlertService.EXTRA_FORCE_WAKE, false)
+                    forceWake = intent.getBooleanExtra(AlertService.EXTRA_FORCE_WAKE, false),
+                    allowLock = intent.action == ACTION_PRAYER
                 )
             } catch (e: Exception) {
                 Log.e("Salati", "Impossible de démarrer l'alerte", e)

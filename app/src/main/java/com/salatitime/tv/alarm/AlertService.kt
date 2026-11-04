@@ -27,6 +27,7 @@ import com.salatitime.tv.SalatiApp
 import com.salatitime.tv.data.AdhanRepository
 import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.data.WakeMode
+import com.salatitime.tv.lock.LockManager
 import com.salatitime.tv.prayer.AlertMode
 import com.salatitime.tv.prayer.Prayer
 import com.salatitime.tv.ui.MainActivity
@@ -93,6 +94,10 @@ class AlertService : Service() {
             WakeMode.ADHAN -> mode == AlertMode.ADHAN
             WakeMode.ALL -> true
         })
+        // Blocage de la TV à la fin de l'alerte (vraies alarmes uniquement, pas les tests)
+        lockAfter = if (intent.getBooleanExtra(EXTRA_ALLOW_LOCK, false) && !pre && prayer.isSalah)
+            prayer.takeIf { prefs.lockMinutes(it) > 0 } else null
+
         val woke = wantWake && ScreenWaker.wake(this)
         pendingAlert = Runnable { runAlert(mode, prayer, title, subtitle, prefs) }
         if (woke) handler.postDelayed(pendingAlert, WAKE_DELAY_MS) else pendingAlert.run()
@@ -100,8 +105,11 @@ class AlertService : Service() {
     }
 
     private var pendingAlert: Runnable = Runnable { }
+    private var lockAfter: Prayer? = null
 
     private fun runAlert(mode: AlertMode, prayer: Prayer, title: String, subtitle: String, prefs: Prefs) {
+        isPlaying = true
+        LockManager.unmute(this)
         when (mode) {
             AlertMode.NONE -> stopAll()
             AlertMode.NOTIFICATION -> {
@@ -201,6 +209,10 @@ class AlertService : Service() {
     private fun stopAll() {
         handler.removeCallbacks(stopRunnable)
         handler.removeCallbacks(pendingAlert)
+        isPlaying = false
+        // Démarrer le blocage pendant que le panneau de l'adhan est encore visible
+        lockAfter?.let { p -> LockManager.start(this, p, Prefs(this).lockMinutes(p)) }
+        lockAfter = null
         releaseAudio()
         overlay.hide()
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
@@ -208,6 +220,7 @@ class AlertService : Service() {
     }
 
     override fun onDestroy() {
+        isPlaying = false
         handler.removeCallbacks(stopRunnable)
         handler.removeCallbacks(pendingAlert)
         releaseAudio()
@@ -271,6 +284,10 @@ class AlertService : Service() {
         const val EXTRA_TIME = "time"
         const val EXTRA_FORCE_MODE = "forceMode"
         const val EXTRA_FORCE_WAKE = "forceWake"
+        const val EXTRA_ALLOW_LOCK = "allowLock"
+
+        /** Vrai pendant une alerte : le blocage laisse passer le son et le panneau. */
+        @Volatile var isPlaying = false
         /** Temps laissé à la TV pour allumer l'écran et la sortie audio. */
         private const val WAKE_DELAY_MS = 3_000L
         const val ACTION_STOP = "com.salatitime.tv.STOP_ALERT"
@@ -280,13 +297,14 @@ class AlertService : Service() {
 
         fun start(
             ctx: Context, prayer: Prayer, pre: Boolean, time: Long,
-            forceMode: AlertMode? = null, forceWake: Boolean = false
+            forceMode: AlertMode? = null, forceWake: Boolean = false, allowLock: Boolean = false
         ) {
             val i = Intent(ctx, AlertService::class.java)
                 .putExtra(EXTRA_PRAYER, prayer.name)
                 .putExtra(EXTRA_PRE, pre)
                 .putExtra(EXTRA_TIME, time)
                 .putExtra(EXTRA_FORCE_WAKE, forceWake)
+                .putExtra(EXTRA_ALLOW_LOCK, allowLock)
             forceMode?.let { i.putExtra(EXTRA_FORCE_MODE, it.name) }
             ContextCompat.startForegroundService(ctx, i)
         }
