@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Smartphone / portrait -->
+    <dimen name="screen_pad_h">16dp</dimen>
+    <dimen name="screen_pad_v">16dp</dimen>
+    <dimen name="overlay_min_width">280dp</dimen>
+    <dimen name="overlay_text_max">240dp</dimen>
+    <dimen name="btn_min_width">0dp</dimen>
+    <dimen name="btn_margin">4dp</dimen>
+    <dimen name="row_value_max">170dp</dimen>
+</resources>

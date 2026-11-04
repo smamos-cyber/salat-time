@@ -196,4 +196,9 @@ class MainActivity : AppCompatActivity() {
             if (it < 2) moveTaskToBack(true) // pour voir l'alerte par-dessus l'écran d'accueil
         }
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        LocationDialogs.onPermissionResult(this, requestCode, grantResults)
+    }
 }

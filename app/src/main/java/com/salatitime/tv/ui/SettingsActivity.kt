@@ -153,6 +153,9 @@ class SettingsActivity : AppCompatActivity() {
         rows.row("Alarmes exactes", {
             if (Permissions.canExactAlarm(this)) "✅ Accordée" else "❌ À activer"
         }) { Permissions.requestExactAlarm(this) }
+        rows.row("Batterie : fonctionner en arrière-plan", {
+            if (Permissions.ignoresBatteryOptimizations(this)) "✅ Accordée" else "⚠️ Conseillé sur téléphone"
+        }) { Permissions.requestIgnoreBatteryOptimizations(this) }
         rows.row("Aide : la TV ne s'allume pas pour l'adhan") {
             info("Allumer la TV pour l'adhan", WAKE_HELP)
         }
@@ -213,5 +216,10 @@ class SettingsActivity : AppCompatActivity() {
                 "3. Vérifiez que l'autorisation « Afficher par-dessus les autres applis » est accordée.\n" +
                 "4. Utilisez « Tester le réveil de la TV » pour vérifier.\n\n" +
                 "Certains modèles bloquent malgré tout le réveil par une application."
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        LocationDialogs.onPermissionResult(this, requestCode, grantResults)
     }
 }

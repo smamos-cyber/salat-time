@@ -1,4 +1,4 @@
-import json, re, sys
+import html, json, re, sys
 src, out = sys.argv[1], sys.argv[2]
 def load(n): return {h['hadithnumber']: h for h in json.load(open(f'{src}/editions/{n}.min.json'))['hadiths']}
 PICKS = {
@@ -23,6 +23,9 @@ for col, ks in PICKS.items():
         items.append({'ar': ar, 'fr': fr, 'ref': f"{NAMES[col]}, n° {num(f[k])}"})
 for it in items:
     for key in ('ar', 'fr'):
-        it[key] = re.sub(r'[‏‎]', '', it[key]); it[key] = re.sub(r'\s+', ' ', it[key]).strip()
+        t = re.sub(r'<br\s*/?>', ' ', it[key], flags=re.I)
+        t = html.unescape(re.sub(r'<[^>]+>', '', t))
+        t = re.sub('[\u200e\u200f]', '', t)
+        it[key] = re.sub(r'\s+', ' ', t).strip()
 json.dump({'source': 'fawazahmed0/hadith-api (domaine public)', 'hadiths': items}, open(out, 'w'), ensure_ascii=False, separators=(',', ':'))
 print(len(items))

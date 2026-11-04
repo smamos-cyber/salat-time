@@ -1,6 +1,22 @@
 package com.salatitime.tv.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.location.Geocoder
+import android.location.Location
+import android.location.LocationManager
+import android.os.Build
+import android.os.Looper
 import android.text.InputType
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import java.util.Locale
+import kotlin.coroutines.resume
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.salatitime.tv.alarm.PrayerScheduler
@@ -12,18 +28,85 @@ import kotlinx.coroutines.launch
 object LocationDialogs {
 
     fun show(a: AppCompatActivity, prefs: Prefs, onDone: () -> Unit) {
-        val items = listOf(
-            "📡  Détecter automatiquement (via la connexion internet)",
-            "🔎  Rechercher une ville",
-            "✏️  Saisir latitude / longitude"
-        )
-        a.choose("Localisation actuelle : ${prefs.placeLabel()}", items) { which ->
-            when (which) {
-                0 -> autoDetect(a, prefs, onDone)
-                1 -> searchCity(a, prefs, onDone)
-                2 -> manual(a, prefs, onDone)
+        val hasGps = a.packageManager.hasSystemFeature(PackageManager.FEATURE_LOCATION)
+        val items = mutableListOf<Pair<String, () -> Unit>>()
+        if (hasGps) items += "🛰  Position du téléphone (GPS)" to { gps(a, prefs, onDone) }
+        items += "📡  Détecter automatiquement (via la connexion internet)" to { autoDetect(a, prefs, onDone) }
+        items += "🔎  Rechercher une ville" to { searchCity(a, prefs, onDone) }
+        items += "✏️  Saisir latitude / longitude" to { manual(a, prefs, onDone) }
+        a.choose("Localisation actuelle : ${prefs.placeLabel()}", items.map { it.first }) { items[it].second() }
+    }
+
+    // ---------- GPS (téléphone, tablette) ----------
+
+    private const val REQ_LOCATION = 4711
+    private var pending: (() -> Unit)? = null
+
+    fun gps(a: AppCompatActivity, prefs: Prefs, onDone: () -> Unit) {
+        val granted = ContextCompat.checkSelfPermission(a, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
+        if (!granted) {
+            pending = { gps(a, prefs, onDone) }
+            ActivityCompat.requestPermissions(
+                a, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), REQ_LOCATION
+            )
+            return
+        }
+        val dlg = a.progressDialog("Recherche de votre position…")
+        a.lifecycleScope.launch {
+            try {
+                val loc = currentLocation(a) ?: throw IllegalStateException(
+                    "Position indisponible. Activez la localisation du téléphone, puis réessayez."
+                )
+                val name = withContext(Dispatchers.IO) { cityName(a, loc.latitude, loc.longitude) }
+                save(a, prefs, GeoPlace(name, loc.latitude, loc.longitude), auto = false, onDone)
+            } catch (e: Exception) {
+                a.info("Échec de la localisation", e.message ?: "Erreur inconnue")
+            } finally {
+                dlg.dismiss()
             }
         }
+    }
+
+    /** À appeler depuis onRequestPermissionsResult des écrans qui affichent ce dialogue. */
+    fun onPermissionResult(a: AppCompatActivity, requestCode: Int, grantResults: IntArray) {
+        if (requestCode != REQ_LOCATION) return
+        val action = pending
+        pending = null
+        if (grantResults.any { it == PackageManager.PERMISSION_GRANTED }) action?.invoke()
+        else a.info("Localisation refusée", "Vous pouvez rechercher votre ville à la place.")
+    }
+
+    @SuppressLint("MissingPermission")
+    private suspend fun currentLocation(a: AppCompatActivity): Location? {
+        val lm = a.getSystemService(LocationManager::class.java) ?: return null
+        val providers = lm.getProviders(true)
+        // Position récente déjà connue (moins d'une heure)
+        providers.mapNotNull { runCatching { lm.getLastKnownLocation(it) }.getOrNull() }
+            .filter { System.currentTimeMillis() - it.time < 3_600_000L }
+            .maxByOrNull { it.time }?.let { return it }
+        val provider = listOf(LocationManager.NETWORK_PROVIDER, LocationManager.GPS_PROVIDER, LocationManager.PASSIVE_PROVIDER)
+            .firstOrNull { it in providers } ?: return null
+        return withTimeoutOrNull(20_000L) {
+            suspendCancellableCoroutine { cont ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    lm.getCurrentLocation(provider, null, a.mainExecutor) { loc -> if (cont.isActive) cont.resume(loc) }
+                } else {
+                    @Suppress("DEPRECATION")
+                    lm.requestSingleUpdate(provider, { loc -> if (cont.isActive) cont.resume(loc) }, Looper.getMainLooper())
+                }
+            }
+        }
+    }
+
+    private fun cityName(a: AppCompatActivity, lat: Double, lng: Double): String {
+        val fallback = "Position du téléphone"
+        if (!Geocoder.isPresent()) return fallback
+        return runCatching {
+            @Suppress("DEPRECATION")
+            val ad = Geocoder(a, Locale.FRANCE).getFromLocation(lat, lng, 1)?.firstOrNull()
+            listOfNotNull(ad?.locality ?: ad?.subAdminArea, ad?.countryName).joinToString(", ").ifBlank { fallback }
+        }.getOrDefault(fallback)
     }
 
     fun autoDetect(a: AppCompatActivity, prefs: Prefs, onDone: () -> Unit) {
