@@ -81,6 +81,22 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
+        <!-- Android Auto : Salati Time apparaît comme une appli audio (horaires du jour, adhans) -->
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+        <meta-data
+            android:name="com.google.android.gms.car.notification.SmallIcon"
+            android:resource="@drawable/ic_notif" />
+        <service
+            android:name=".car.SalatiMediaService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
         <!-- Widgets de l'écran d'accueil (téléphone, tablette) -->
         <receiver
             android:name=".widget.TimesWidget"
