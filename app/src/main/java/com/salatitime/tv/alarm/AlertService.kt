@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat
 import com.salatitime.tv.R
 import com.salatitime.tv.SalatiApp
 import com.salatitime.tv.data.AdhanRepository
+import com.salatitime.tv.car.CarState
 import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.data.WakeMode
 import com.salatitime.tv.lock.LockManager
@@ -98,7 +99,8 @@ class AlertService : Service() {
         lockPrayer = if (intent.getBooleanExtra(EXTRA_ALLOW_LOCK, false) && !pre && prayer.isSalah)
             prayer.takeIf { prefs.lockMinutes(it) > 0 } else null
 
-        val woke = wantWake && ScreenWaker.wake(this)
+        // En voiture (Android Auto) : l'adhan passe par les haut-parleurs, sans allumer l'écran du téléphone
+        val woke = wantWake && !CarState.isInCar(this) && ScreenWaker.wake(this)
         pendingAlert = Runnable { runAlert(mode, prayer, title, subtitle, prefs) }
         if (woke) handler.postDelayed(pendingAlert, WAKE_DELAY_MS) else pendingAlert.run()
         return START_NOT_STICKY

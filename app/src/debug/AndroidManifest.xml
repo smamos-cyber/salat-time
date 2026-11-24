@@ -5,5 +5,8 @@
         <activity
             android:name=".widget.WidgetPreviewActivity"
             android:exported="true" />
+        <activity
+            android:name=".car.CarBrowseTestActivity"
+            android:exported="true" />
     </application>
 </manifest>
