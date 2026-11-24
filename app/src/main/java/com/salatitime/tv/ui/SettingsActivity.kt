@@ -153,6 +153,17 @@ class SettingsActivity : AppCompatActivity() {
         rows.row("Alarmes exactes", {
             if (Permissions.canExactAlarm(this)) "✅ Accordée" else "❌ À activer"
         }) { Permissions.requestExactAlarm(this) }
+        rows.row("⌚  Tester la notification sur la montre", { "envoie une notification maintenant" }) {
+            if (!androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                info("Notifications désactivées", "Autorisez les notifications de Salati Time dans les paramètres du téléphone.")
+            } else {
+                com.salatitime.tv.alarm.PrayerNotification.post(
+                    this, Prayer.ASR, "🕌 Test Salati Time", "Si votre montre vibre, tout est prêt.", null
+                )
+                info("Notification envoyée", WATCH_HELP)
+            }
+        }
+        rows.row("Aide : recevoir les prières sur une montre") { info("Montre connectée", WATCH_HELP) }
         rows.row("Batterie : fonctionner en arrière-plan", {
             if (Permissions.ignoresBatteryOptimizations(this)) "✅ Accordée" else "⚠️ Conseillé sur téléphone"
         }) { Permissions.requestIgnoreBatteryOptimizations(this) }
@@ -207,6 +218,12 @@ class SettingsActivity : AppCompatActivity() {
 
     private companion object {
         val PIN_INPUT = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        const val WATCH_HELP =
+            "À chaque prière, Salati Time envoie une courte notification qui fait vibrer la montre.\n\n" +
+                "Huawei (Watch Fit, Watch GT) : appli Huawei Santé > Appareils > votre montre > Notifications : " +
+                "activez les notifications et cochez Salati Time.\n" +
+                "Astuce : par défaut, Huawei ne transmet les notifications que lorsque l'écran du téléphone est éteint.\n\n" +
+                "Wear OS, Samsung : les notifications du téléphone sont relayées automatiquement si l'appli est autorisée."
         const val ACTION_WAKE_TEST = "com.salatitime.tv.WAKE_TEST"
         const val WAKE_HELP =
             "Une application ne peut rallumer la TV que si elle est en veille, pas si elle est débranchée.\n\n" +
