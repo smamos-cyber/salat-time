@@ -5,6 +5,7 @@ import android.media.AudioManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import android.content.Intent
+import com.salatitime.tv.car.CarState
 import com.salatitime.tv.data.HadithRepository
 import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.prayer.Prayer
@@ -46,6 +47,8 @@ object LockManager {
     /** Démarre (ou prolonge) le blocage pour la prière donnée. */
     fun start(ctx: Context, prayer: Prayer, minutes: Int) {
         if (minutes <= 0) return
+        // Jamais de blocage (ni de son coupé) quand le téléphone est sur Android Auto
+        if (CarState.isInCar(ctx)) return
         val prefs = Prefs(ctx)
         val until = System.currentTimeMillis() + minutes * 60_000L
         if (until > prefs.lockUntil) {

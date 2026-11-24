@@ -15,6 +15,7 @@ import androidx.core.app.ServiceCompat
 import com.salatitime.tv.R
 import com.salatitime.tv.SalatiApp
 import com.salatitime.tv.alarm.AlertService
+import com.salatitime.tv.car.CarState
 import com.salatitime.tv.data.HadithRepository
 import com.salatitime.tv.data.Prefs
 import com.salatitime.tv.prayer.Prayer
@@ -64,7 +65,7 @@ class LockService : Service() {
         val prefs = Prefs(this)
         val ov = overlay ?: return
         // Téléphone : ne jamais empêcher un appel (entrant, sortant, ou appel audio/vidéo d'une appli)
-        if (inCall() || System.currentTimeMillis() < emergencyUntil) {
+        if (inCall() || System.currentTimeMillis() < emergencyUntil || CarState.isInCar(this)) {
             if (inCall()) emergencyUntil = maxOf(emergencyUntil, System.currentTimeMillis() + 15_000L)
             if (ov.isShown()) ov.hide()
             LockManager.unmute(this)
