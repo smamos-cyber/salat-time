@@ -11,8 +11,8 @@ android {
         applicationId = "com.salatitime.tv"
         minSdk = 26          // Android TV 8.0 et plus
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.8"
+        versionCode = 10
+        versionName = "1.9"
     }
 
     signingConfigs {

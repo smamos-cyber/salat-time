@@ -41,6 +41,8 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
   (prochaine prière et temps restant) et les adhans à écouter. À l'heure de la prière, l'adhan passe par les
   haut-parleurs de la voiture ; pas de blocage ni de son coupé en voiture. Installation par APK : activer
   « Sources inconnues » dans les paramètres développeur d'Android Auto.
+- **Montre connectée** (Huawei Watch Fit / GT via Huawei Santé, Wear OS, Samsung…) : à chaque prière, une courte
+  notification vibrante (« 🕌 Asr — 13:41 ») est relayée au poignet. Bouton de test dans les paramètres.
 - Reprogrammation automatique après redémarrage de la TV, changement d'heure ou de fuseau.
 
 ## Obtenir l'APK sans rien installer (GitHub, gratuit)

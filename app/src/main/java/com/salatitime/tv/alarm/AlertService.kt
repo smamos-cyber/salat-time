@@ -76,6 +76,8 @@ class AlertService : Service() {
             else -> "C'est l'heure de la prière : ${prayer.label}"
         }
         val subtitle = "${prayer.arabic}  •  ${Format.time(time)}"
+        val watchTitle = if (pre) "🕌 ${prayer.label} dans ${prefs.preAlertMinutes} min" else "🕌 ${prayer.label} — ${Format.time(time)}"
+        val watchText = if (pre) "${prayer.arabic} · à ${Format.time(time)}" else "${prayer.arabic} · C'est l'heure de la prière"
 
         startInForeground(title, subtitle)
         handler.removeCallbacks(stopRunnable)
@@ -101,6 +103,8 @@ class AlertService : Service() {
 
         // En voiture (Android Auto) : l'adhan passe par les haut-parleurs, sans allumer l'écran du téléphone
         val woke = wantWake && !CarState.isInCar(this) && ScreenWaker.wake(this)
+        // Notification courte et vibrante : c'est elle que la montre connectée affiche
+        postInfoNotification(prayer, watchTitle, watchText)
         pendingAlert = Runnable { runAlert(mode, prayer, title, subtitle, prefs) }
         if (woke) handler.postDelayed(pendingAlert, WAKE_DELAY_MS) else pendingAlert.run()
         return START_NOT_STICKY
@@ -124,13 +128,11 @@ class AlertService : Service() {
         when (mode) {
             AlertMode.NONE -> stopAll()
             AlertMode.NOTIFICATION -> {
-                postInfoNotification(prayer, title, subtitle)
                 if (!overlay.showBanner(title, subtitle)) toast(title, subtitle)
                 playBeep()
                 handler.postDelayed(stopRunnable, BANNER_DURATION_MS)
             }
             AlertMode.ADHAN -> {
-                postInfoNotification(prayer, title, subtitle)
                 val shown = overlay.showAdhan(title, subtitle, onStop = { stopAll() })
                 if (!shown) toast(title, subtitle)
                 playAdhan(prefs.soundIdFor(prayer), prefs.volume)
@@ -260,23 +262,8 @@ class AlertService : Service() {
         ServiceCompat.startForeground(this, FG_ID, n, type)
     }
 
-    private fun postInfoNotification(prayer: Prayer, title: String, text: String) {
-        val nm = NotificationManagerCompat.from(this)
-        if (!nm.areNotificationsEnabled()) return
-        val n = NotificationCompat.Builder(this, SalatiApp.CHANNEL_ALERTS)
-            .setSmallIcon(R.drawable.ic_notif)
-            .setContentTitle(title)
-            .setContentText(text)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setAutoCancel(true)
-            .setTimeoutAfter(30 * 60 * 1000L)
-            .setContentIntent(openAppIntent())
-            .build()
-        try {
-            nm.notify(1000 + prayer.ordinal, n)
-        } catch (_: SecurityException) { }
-    }
+    private fun postInfoNotification(prayer: Prayer, title: String, text: String) =
+        PrayerNotification.post(this, prayer, title, text, openAppIntent())
 
     private fun openAppIntent(): PendingIntent = PendingIntent.getActivity(
         this, 0, Intent(this, MainActivity::class.java),
