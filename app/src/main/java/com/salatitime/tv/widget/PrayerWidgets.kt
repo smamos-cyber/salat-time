@@ -51,6 +51,15 @@ object PrayerWidgets {
     private data class Next(val prayer: Prayer, val time: ZonedDateTime)
 
     /** Met à jour tous les widgets posés sur l'écran d'accueil, puis programme la prochaine mise à jour. */
+    /** Vues des deux widgets, sans les poser (aperçu de la version de test). */
+    fun previewViews(ctx: Context): Pair<RemoteViews, RemoteViews> {
+        val prefs = Prefs(ctx)
+        val now = ZonedDateTime.now()
+        val today = prefs.timesFor(LocalDate.now())
+        val next = nextPrayer(prefs, now, today)
+        return timesViews(ctx, prefs, today, next, now) to nextViews(ctx, next, now)
+    }
+
     fun updateAll(ctx: Context) {
         val mgr = AppWidgetManager.getInstance(ctx) ?: return
         val timesIds = mgr.getAppWidgetIds(ComponentName(ctx, TimesWidget::class.java))

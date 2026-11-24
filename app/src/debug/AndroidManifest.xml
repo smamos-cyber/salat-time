@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Version de test uniquement : écran d'aperçu des widgets pour les captures -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name=".widget.WidgetPreviewActivity"
+            android:exported="true" />
+    </application>
+</manifest>
