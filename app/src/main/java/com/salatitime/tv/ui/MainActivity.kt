@@ -95,6 +95,7 @@ class MainActivity : AppCompatActivity() {
         refreshTimes()
         handler.post(ticker)
         com.salatitime.tv.lock.LockManager.ensureRunning(this)
+        com.salatitime.tv.widget.PrayerWidgets.updateAll(this)
         maybeAutoLocate()
         maybeShowOverlayHint()
     }

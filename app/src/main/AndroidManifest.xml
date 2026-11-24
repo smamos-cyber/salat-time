@@ -81,6 +81,33 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
+        <!-- Widgets de l'écran d'accueil (téléphone, tablette) -->
+        <receiver
+            android:name=".widget.TimesWidget"
+            android:exported="false"
+            android:label="@string/widget_times_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_times_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.NextPrayerWidget"
+            android:exported="false"
+            android:label="@string/widget_next_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next_info" />
+        </receiver>
+
         <service
             android:name=".lock.LockService"
             android:exported="false"
