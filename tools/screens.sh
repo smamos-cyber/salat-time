@@ -16,4 +16,10 @@ put lock fes alhambra 7
 adb shell am start -n $PKG/.ui.MainActivity; shot blocage 12
 put lock lapis nasir_vitraux 40
 adb shell am start -n $PKG/.ui.MainActivity; shot blocage2 12
+if [ "$DEV" = "telephone" ]; then
+  put normal medine "" 5
+  adb shell am start -n $PKG/.widget.WidgetPreviewActivity; shot widgets_medine 8
+  put normal maghrib "" 5
+  adb shell am start -n $PKG/.widget.WidgetPreviewActivity; shot widgets_maghrib 8
+fi
 adb logcat -d | grep -iE "salati|AndroidRuntime|FATAL" | tail -80 > "$OUT/${DEV}_logcat.txt"
