@@ -35,6 +35,8 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
 - **Smartphone et tablette** : écrans adaptés au format portrait et au tactile, position GPS, pavé tactile pour le code
   de déblocage. Pendant le blocage, les appels restent possibles (l'écran se retire pendant un appel) et un bouton
   « Appel d'urgence » ouvre le composeur.
+- **Widgets Android** (téléphone, tablette) : « Horaires de prière » (prochaine prière, compte à rebours, six horaires
+  du jour) et « Prochaine prière » (petit format). Couleurs du thème choisi ; un appui ouvre l'appli.
 - Reprogrammation automatique après redémarrage de la TV, changement d'heure ou de fuseau.
 
 ## Obtenir l'APK sans rien installer (GitHub, gratuit)

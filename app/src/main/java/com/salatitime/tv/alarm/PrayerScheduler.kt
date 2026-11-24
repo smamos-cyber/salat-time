@@ -38,6 +38,8 @@ object PrayerScheduler {
     }
 
     fun schedule(ctx: Context, after: ZonedDateTime = ZonedDateTime.now()) {
+        // Les widgets suivent tout changement d'horaires, de lieu ou de réglages
+        runCatching { com.salatitime.tv.widget.PrayerWidgets.updateAll(ctx) }
         val am = ctx.getSystemService(AlarmManager::class.java) ?: return
         val pi = pendingIntent(ctx, null)
         val event = nextEvent(ctx, after)
