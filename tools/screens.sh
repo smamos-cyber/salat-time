@@ -21,5 +21,7 @@ if [ "$DEV" = "telephone" ]; then
   adb shell am start -n $PKG/.widget.WidgetPreviewActivity; shot widgets_medine 8
   put normal maghrib "" 5
   adb shell am start -n $PKG/.widget.WidgetPreviewActivity; shot widgets_maghrib 8
+  put normal medine "" 5
+  adb shell am start -n $PKG/.car.CarBrowseTestActivity; shot android_auto 12
 fi
 adb logcat -d | grep -iE "salati|AndroidRuntime|FATAL" | tail -80 > "$OUT/${DEV}_logcat.txt"
