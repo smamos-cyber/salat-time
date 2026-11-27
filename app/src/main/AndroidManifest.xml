@@ -29,6 +29,11 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
+    <!-- Détection d'Android Auto (fournisseur publié par l'appli Android Auto) -->
+    <queries>
+        <provider android:authorities="androidx.car.app.connection" />
+    </queries>
+
     <application
         android:name=".SalatiApp"
         android:allowBackup="true"

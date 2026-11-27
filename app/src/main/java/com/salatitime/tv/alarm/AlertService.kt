@@ -102,7 +102,8 @@ class AlertService : Service() {
             prayer.takeIf { prefs.lockMinutes(it) > 0 } else null
 
         // En voiture (Android Auto) : l'adhan passe par les haut-parleurs, sans allumer l'écran du téléphone
-        val woke = wantWake && !CarState.isInCar(this) && ScreenWaker.wake(this)
+        inCar = CarState.isInCar(this)
+        val woke = wantWake && !inCar && ScreenWaker.wake(this)
         // Notification courte et vibrante : c'est elle que la montre connectée affiche
         postInfoNotification(prayer, watchTitle, watchText)
         pendingAlert = Runnable { runAlert(mode, prayer, title, subtitle, prefs) }
@@ -143,10 +144,23 @@ class AlertService : Service() {
 
     // ---------------- Audio ----------------
 
-    private val audioAttributes: AudioAttributes = AudioAttributes.Builder()
-        .setUsage(AudioAttributes.USAGE_MEDIA) // suit le volume de la TV
+    private val mediaAttributes: AudioAttributes = AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_MEDIA) // suit le volume de la TV / du téléphone
         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
         .build()
+
+    /**
+     * En voiture (Android Auto) : canal « guidage GPS ». La voiture le diffuse toujours,
+     * quelle que soit la source (radio, Bluetooth, Spotify…), en coupant ou baissant le reste.
+     * Un son « média » n'est entendu que si l'autoradio est déjà sur Android Auto.
+     */
+    private val carAttributes: AudioAttributes = AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+        .build()
+
+    private var inCar = false
+    private val audioAttributes: AudioAttributes get() = if (inCar) carAttributes else mediaAttributes
 
     private fun requestFocus() {
         val am = getSystemService(AudioManager::class.java) ?: return
@@ -189,11 +203,28 @@ class AlertService : Service() {
     }
 
     private fun playBeep() {
+        if (inCar) {
+            // En voiture : bip court sur le canal guidage (le ToneGenerator « musique » serait inaudible)
+            playCarBeep(); return
+        }
         try {
             tone = ToneGenerator(AudioManager.STREAM_MUSIC, Prefs(this).volume.coerceIn(10, 100)).also {
                 it.startTone(ToneGenerator.TONE_PROP_BEEP2, 600)
             }
         } catch (_: Exception) { }
+    }
+
+    private fun playCarBeep() {
+        requestFocus()
+        try {
+            player = MediaPlayer().apply {
+                setAudioAttributes(carAttributes)
+                setDataSource(this@AlertService, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                setOnCompletionListener { releasePlayer(); abandonFocus() }
+                prepare()
+                start()
+            }
+        } catch (_: Exception) { abandonFocus() }
     }
 
     private fun playFallbackTone() {
