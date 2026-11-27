@@ -36,7 +36,8 @@ Application Android TV (Kotlin) qui affiche les horaires de prière selon votre 
   de déblocage. Pendant le blocage, les appels restent possibles (l'écran se retire pendant un appel) et un bouton
   « Appel d'urgence » ouvre le composeur.
 - **Widgets Android** (téléphone, tablette) : « Horaires de prière » (prochaine prière, compte à rebours, six horaires
-  du jour) et « Prochaine prière » (petit format). Couleurs du thème choisi ; un appui ouvre l'appli.
+  du jour) et « Prochaine prière » (petit format, avec la phase de la lune calculée astronomiquement : dessin de la
+  partie éclairée, nom de la phase, pourcentage d'éclairement, date de la prochaine pleine ou nouvelle lune). Couleurs du thème choisi ; un appui ouvre l'appli.
 - **Android Auto** : Salati Time apparaît parmi les applis audio de la voiture, avec les horaires du jour
   (prochaine prière et temps restant) et les adhans à écouter. À l'heure de la prière, l'adhan passe par les
   haut-parleurs de la voiture sur le canal « guidage GPS » : il est entendu quelle que soit la source

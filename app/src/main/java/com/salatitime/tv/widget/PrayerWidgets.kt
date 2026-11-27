@@ -19,6 +19,9 @@ import com.salatitime.tv.ui.MainActivity
 import com.salatitime.tv.ui.theme.ThemeEngine
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import com.salatitime.tv.prayer.MoonPhase
 
 /** Widget « Horaires de prière » : prochaine prière, compte à rebours, six horaires du jour. */
 class TimesWidget : AppWidgetProvider() {
@@ -142,10 +145,30 @@ object PrayerWidgets {
         return v
     }
 
+    private val MOON_DATE = DateTimeFormatter.ofPattern("EEE d MMM", Locale.FRENCH)
+
+    /** Phase de la lune (calcul astronomique) : dessin exact, nom, éclairement, prochaine pleine/nouvelle lune. */
+    private fun RemoteViews.moon(ctx: Context, now: ZonedDateTime) {
+        val th = ThemeEngine.theme(ctx)
+        val info = MoonPhase.at(now.toInstant())
+        val southern = (Prefs(ctx).latitude ?: 45.0) < 0
+        val px = (30 * ctx.resources.displayMetrics.density).toInt().coerceIn(32, 160)
+        setImageViewBitmap(R.id.moonImg, MoonPhase.bitmap(info, px, southern))
+        val pct = Math.round(info.illumination * 100)
+        setTextViewText(R.id.moonName, "${info.name} · $pct %")
+        val (label, at) = MoonPhase.nextMajor(now)
+        val days = java.time.Duration.between(now, at).toHours() / 24
+        val whenTxt = if (days < 1) "aujourd'hui" else MOON_DATE.format(at).replace(".", "")
+        setTextViewText(R.id.moonNext, "$label : $whenTxt")
+        setTextColor(R.id.moonName, th.text)
+        setTextColor(R.id.moonNext, th.textDim)
+    }
+
     private fun nextViews(ctx: Context, next: Next?, now: ZonedDateTime): RemoteViews {
         val th = ThemeEngine.theme(ctx)
         val v = RemoteViews(ctx.packageName, R.layout.widget_next)
         v.background(ctx)
+        runCatching { v.moon(ctx, now) }
         v.setTextColor(R.id.nextName, th.accentSoft)
         v.setTextColor(R.id.nextTime, th.text)
         v.setTextColor(R.id.countdown, ColorUtils.setAlphaComponent(th.accent, 0xFF))
@@ -174,7 +197,8 @@ object PrayerWidgets {
     private fun scheduleRefresh(ctx: Context, nextTime: ZonedDateTime?, now: ZonedDateTime) {
         val am = ctx.getSystemService(AlarmManager::class.java) ?: return
         val midnight = now.toLocalDate().plusDays(1).atStartOfDay(now.zone)
-        val at = listOfNotNull(nextTime, midnight).filter { it.isAfter(now) }.minOrNull() ?: midnight
+        val sixHours = now.plusHours(6) // la phase de la lune évolue en continu
+        val at = listOfNotNull(nextTime, midnight, sixHours).filter { it.isAfter(now) }.minOrNull() ?: midnight
         val pi = PendingIntent.getBroadcast(
             ctx, 301,
             Intent(ctx, TimesWidget::class.java).setAction(ACTION_REFRESH),
